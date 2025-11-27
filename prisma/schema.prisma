@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Professional {
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  password    String    // hash du mot de passe
+  city        String    // ville principale (pour compatibilité)
+  cities      String?   // villes multiples séparées par virgule: "Tel Aviv,Jérusalem"
+  serviceType String
+  subcategories String?  // sous-catégories séparées par virgule: "Homme,Femme,Coloration"
+  description String?
+  languages   String    // ex: "fr,he,en"
+  phone       String?   // téléphone
+  availability String?  // heures de disponibilité JSON: { "monday": {"start": "09:00", "end": "18:00"}, "tuesday": {...}, "slotDuration": 30 }
+  closedDays  String?  // jours fermés séparés par virgule: "saturday,sunday"
+  breakStart  String?  // heure de début de pause: "12:00"
+  breakEnd    String?  // heure de fin de pause: "13:00"
+  bio         String?   // bio personnalisée
+  profileImage String?  // URL de l'image de profil
+  gallery     String?   // URLs des photos séparées par virgule
+  verified    Boolean   @default(false) // professionnel vérifié
+  badge       String?   // badge spécial (ex: "Meilleur service")
+  subscriptionPlan String? // "free" | "premium" | "pro"
+  bookings    Booking[]
+  reviews     Review[]
+  favorites   Favorite[]
+}
+
+model Client {
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String?   // hash du mot de passe (optionnel pour compatibilité)
+  bookings Booking[]
+  reviews  Review[]
+  favorites Favorite[]
+}
+
+model Booking {
+  id             Int          @id @default(autoincrement())
+  professional   Professional @relation(fields: [professionalId], references: [id])
+  professionalId Int
+  client         Client       @relation(fields: [clientId], references: [id])
+  clientId       Int
+  startTime      DateTime
+  endTime        DateTime
+  status         String       // "pending" | "confirmed" | "cancelled"
+  amount         Float?       // montant en shekels
+  paymentStatus  String?      // "pending" | "paid" | "refunded"
+  paymentIntentId String?      // ID Stripe
+  promoCode      String?      // code promo utilisé
+  review         Review?
+  messages       Message[]
+}
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+  bookingId   Int      @unique
+  professional Professional @relation(fields: [professionalId], references: [id])
+  professionalId Int
+  client      Client   @relation(fields: [clientId], references: [id])
+  clientId    Int
+  rating      Int      // 1-5 étoiles
+  comment     String?
+  createdAt   DateTime @default(now())
+}
+
+model Message {
+  id          Int      @id @default(autoincrement())
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+  bookingId   Int
+  senderId    Int      // ID du client ou professionnel
+  senderType  String   // "client" | "professional"
+  content     String
+  createdAt   DateTime @default(now())
+}
+
+model Favorite {
+  id             Int          @id @default(autoincrement())
+  client         Client       @relation(fields: [clientId], references: [id])
+  clientId       Int
+  professional   Professional @relation(fields: [professionalId], references: [id])
+  professionalId Int
+  createdAt      DateTime     @default(now())
+
+  @@unique([clientId, professionalId])
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String // hash du mot de passe
+  name     String
+  createdAt DateTime @default(now())
+}
