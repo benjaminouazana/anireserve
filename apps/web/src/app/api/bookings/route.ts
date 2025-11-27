@@ -24,11 +24,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // Vérifier les conflits
+    // Vérifier les conflits (seulement avec les réservations confirmées ou en attente)
     const overlapping = await prisma.booking.findFirst({
       where: {
         professionalId,
-        status: { not: "cancelled" },
+        status: { in: ["pending", "confirmed"] }, // Exclure seulement les annulées
         OR: [
           {
             AND: [
@@ -85,9 +85,9 @@ export async function POST(req: Request) {
       },
     });
 
-    // Envoyer un email de confirmation au client
+    // Envoyer des emails (client et pro)
     try {
-      const { sendBookingConfirmationEmail } = await import("@/lib/email");
+      const { sendBookingRequestEmailToClient, sendBookingRequestEmailToPro } = await import("@/lib/email");
       const dateStr = startDateTime.toLocaleDateString("fr-FR", {
         day: "2-digit",
         month: "2-digit",
@@ -95,10 +95,21 @@ export async function POST(req: Request) {
       });
       const timeStr = `${startTime} - ${endTime}`;
 
-      await sendBookingConfirmationEmail(
+      // Email au client : demande créée
+      await sendBookingRequestEmailToClient(
         client.email,
         client.name,
         booking.professional.name,
+        dateStr,
+        timeStr
+      );
+
+      // Email au pro : nouvelle demande
+      await sendBookingRequestEmailToPro(
+        booking.professional.email,
+        booking.professional.name,
+        client.name,
+        client.email,
         dateStr,
         timeStr
       );

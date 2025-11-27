@@ -12,7 +12,9 @@ export async function GET(req: Request) {
     const sortBy = searchParams.get("sortBy") || "name";
 
     // Construire les conditions de recherche
-    const whereConditions: any = {};
+    const whereConditions: any = {
+      status: "approved", // Seulement les profils approuvés
+    };
 
     // Recherche par ville (ville principale ou villes multiples)
     if (city) {

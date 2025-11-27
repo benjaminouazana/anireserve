@@ -18,6 +18,22 @@ export async function POST(req: Request) {
       where: { email },
     });
 
+    // Vérifier que le profil est approuvé
+    if (professional && professional.status !== "approved") {
+      if (professional.status === "pending") {
+        return NextResponse.json(
+          { error: "Ton profil est en cours de vérification. Tu recevras un email dès qu'il sera validé." },
+          { status: 403 }
+        );
+      }
+      if (professional.status === "rejected") {
+        return NextResponse.json(
+          { error: "Ton profil a été rejeté. Contacte-nous pour plus d'informations." },
+          { status: 403 }
+        );
+      }
+    }
+
     if (!professional || !professional.password) {
       return NextResponse.json(
         { error: "Email ou mot de passe incorrect" },

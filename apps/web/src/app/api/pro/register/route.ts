@@ -4,10 +4,25 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, city, cities, serviceType, subcategories, description, phone, languages } =
-      await req.json();
+    const {
+      firstName,
+      lastName,
+      name,
+      email,
+      password,
+      phone,
+      city,
+      cities,
+      serviceType,
+      services,
+      subcategories,
+      description,
+      teoudatZeout,
+      languages,
+      status,
+    } = await req.json();
 
-    if (!name || !email || !password || !city || !serviceType) {
+    if (!firstName || !lastName || !email || !password || !city || !serviceType || !teoudatZeout) {
       return NextResponse.json(
         { error: "Tous les champs obligatoires doivent être remplis" },
         { status: 400 }
@@ -38,35 +53,43 @@ export async function POST(req: Request) {
 
     const professional = await prisma.professional.create({
       data: {
-        name,
+        firstName,
+        lastName,
+        name: name || `${firstName} ${lastName}`,
         email,
         password: hashedPassword,
+        phone: phone || null,
         city,
         cities: cities || city,
         serviceType,
+        services: services || serviceType,
         subcategories: subcategories || null,
         description: description || null,
-        phone: phone || null,
-        languages: "fr", // Site entièrement en français
+        teoudatZeout: teoudatZeout || null,
+        languages: languages || "fr",
+        status: status || "pending", // Statut par défaut : en attente
       },
       select: {
         id: true,
+        firstName: true,
+        lastName: true,
         name: true,
         email: true,
         city: true,
         serviceType: true,
+        status: true,
       },
     });
 
     return NextResponse.json(
       {
-        message: "Compte créé avec succès",
+        message: "Demande d'inscription soumise avec succès. Ton profil est en cours de vérification.",
         professional,
       },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error(error);
+    console.error("Erreur inscription pro:", error);
     return NextResponse.json(
       { error: error.message || "Erreur lors de la création du compte" },
       { status: 500 }

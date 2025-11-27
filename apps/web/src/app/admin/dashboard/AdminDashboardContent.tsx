@@ -124,6 +124,12 @@ export function AdminDashboardContent({ admin }: { admin: Admin }) {
           </div>
           <div className="flex gap-2 flex-wrap">
             <Link
+              href="/admin/professionals/pending"
+              className="inline-flex items-center rounded-full glass px-4 py-2 text-sm font-semibold text-amber-700 shadow-lg hover-lift hover:shadow-xl transition-all"
+            >
+              ⏳ Valider les profils
+            </Link>
+            <Link
               href="/admin/users"
               className="inline-flex items-center rounded-full glass px-4 py-2 text-sm font-semibold text-purple-700 shadow-lg hover-lift hover:shadow-xl transition-all"
             >
