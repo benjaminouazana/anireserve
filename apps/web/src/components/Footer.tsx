@@ -4,27 +4,33 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-purple-900 via-pink-900 to-blue-900 text-white mt-auto">
+    <footer className="text-white mt-auto" style={{ backgroundColor: "#18223b" }}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* À propos */}
           <div>
-            <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
+            <h3 className="text-lg font-bold mb-4" style={{ color: "#FFDE59" }}>
               À propos
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/qui-sommes-nous"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Qui sommes-nous ?
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  href="/comment-ca-marche"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Comment ça marche ?
                 </Link>
@@ -32,7 +38,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/professionals"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Trouver un professionnel
                 </Link>
@@ -42,14 +51,17 @@ export function Footer() {
 
           {/* Pour les clients */}
           <div>
-            <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-pink-300 to-blue-300 bg-clip-text text-transparent">
+            <h3 className="text-lg font-bold mb-4" style={{ color: "#FFDE59" }}>
               Pour les clients
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/client/register"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Créer un compte
                 </Link>
@@ -57,7 +69,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/client/login"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Se connecter
                 </Link>
@@ -65,9 +80,23 @@ export function Footer() {
               <li>
                 <Link
                   href="/my-bookings"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Mes réservations
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/my-favorites"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
+                >
+                  Mes favoris
                 </Link>
               </li>
             </ul>
@@ -75,14 +104,17 @@ export function Footer() {
 
           {/* Pour les professionnels */}
           <div>
-            <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
+            <h3 className="text-lg font-bold mb-4" style={{ color: "#FFDE59" }}>
               Pour les professionnels
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/pro/register"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   S'inscrire comme pro
                 </Link>
@@ -90,7 +122,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/pro/login"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Espace professionnel
                 </Link>
@@ -98,7 +133,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/pro/register"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Rejoindre la plateforme
                 </Link>
@@ -108,14 +146,17 @@ export function Footer() {
 
           {/* Support & Légale */}
           <div>
-            <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
+            <h3 className="text-lg font-bold mb-4" style={{ color: "#FFDE59" }}>
               Support & Légale
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/contact"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Nous contacter
                 </Link>
@@ -123,7 +164,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/faq"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   FAQ
                 </Link>
@@ -131,7 +175,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/cgv"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   CGV
                 </Link>
@@ -139,7 +186,10 @@ export function Footer() {
               <li>
                 <Link
                   href="/confidentialite"
-                  className="text-purple-200 hover:text-white transition hover:underline"
+                  className="transition hover:underline"
+                  style={{ color: "#2FB190" }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                  onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 >
                   Confidentialité
                 </Link>
@@ -149,13 +199,13 @@ export function Footer() {
         </div>
 
         {/* Séparateur */}
-        <div className="mt-12 pt-8 border-t border-purple-700">
+        <div className="mt-12 pt-8" style={{ borderTop: "1px solid #2FB190" }}>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent mb-2">
+              <h2 className="text-2xl font-bold mb-2" style={{ color: "#FFDE59" }}>
                 Ani reserve
               </h2>
-              <p className="text-sm text-purple-200">
+              <p className="text-sm" style={{ color: "#2FB190" }}>
                 La plateforme de réservation en Israël pour les Français
               </p>
             </div>
@@ -164,7 +214,10 @@ export function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-purple-200 hover:text-white transition"
+                className="transition"
+                style={{ color: "#2FB190" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 aria-label="Facebook"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -175,7 +228,10 @@ export function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-purple-200 hover:text-white transition"
+                className="transition"
+                style={{ color: "#2FB190" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 aria-label="Instagram"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -186,7 +242,10 @@ export function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-purple-200 hover:text-white transition"
+                className="transition"
+                style={{ color: "#2FB190" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#FFDE59"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "#2FB190"}
                 aria-label="LinkedIn"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -195,7 +254,7 @@ export function Footer() {
               </a>
             </div>
           </div>
-          <div className="mt-8 text-center text-sm text-purple-300">
+          <div className="mt-8 text-center text-sm" style={{ color: "#2FB190" }}>
             <p>© {new Date().getFullYear()} Ani reserve. Tous droits réservés.</p>
           </div>
         </div>

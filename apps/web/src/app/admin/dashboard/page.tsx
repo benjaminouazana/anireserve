@@ -12,3 +12,6 @@ export default async function AdminDashboardPage() {
   return <AdminDashboardContent admin={admin} />;
 }
 
+
+
+

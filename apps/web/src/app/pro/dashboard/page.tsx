@@ -1,10 +1,30 @@
 import { prisma } from "@/lib/prisma";
-import { BookingActions } from "./BookingActions";
 import Link from "next/link";
 import { getCurrentProfessional } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { LogoutButton } from "./LogoutButton";
-import { CalendarView } from "./CalendarView";
+import dynamic from "next/dynamic";
+import { generateSlug } from "@/lib/slug";
+
+// Fonction pour obtenir le slug d'un professionnel
+function getProfessionalSlug(pro: any): string {
+  if (pro.slug) return pro.slug;
+  return generateSlug(pro.name);
+}
+
+// Lazy loading des composants lourds
+const BookingActions = dynamic(() => import("./BookingActions").then(mod => ({ default: mod.BookingActions })), {
+  loading: () => <div className="text-center py-4 text-zinc-500">Chargement...</div>,
+  ssr: false,
+});
+
+const LogoutButton = dynamic(() => import("./LogoutButton").then(mod => ({ default: mod.LogoutButton })), {
+  ssr: false,
+});
+
+const CalendarView = dynamic(() => import("./CalendarView").then(mod => ({ default: mod.CalendarView })), {
+  loading: () => <div className="text-center py-8 text-zinc-500">Chargement du calendrier...</div>,
+  ssr: false,
+});
 
 export default async function ProDashboardPage() {
   const professional = await getCurrentProfessional();
@@ -57,7 +77,7 @@ export default async function ProDashboardPage() {
           </div>
           <div className="flex gap-2">
             <Link
-              href={`/professionals/${professional.id}`}
+              href={`/professionals/${getProfessionalSlug(professional)}`}
               className="inline-flex items-center rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50"
             >
               Voir mon profil

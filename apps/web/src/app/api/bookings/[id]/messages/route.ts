@@ -39,7 +39,7 @@ export async function GET(
       orderBy: { createdAt: "asc" },
     });
 
-    return NextResponse.json(messages);
+    return NextResponse.json({ messages });
   } catch (error: any) {
     console.error("Erreur API /api/bookings/[id]/messages:", error);
     return NextResponse.json(
@@ -55,7 +55,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const { content } = await req.json();
+    const { content, senderId: providedSenderId, senderType: providedSenderType } = await req.json();
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json(
@@ -86,14 +86,29 @@ export async function POST(
     let senderId: number;
     let senderType: string;
 
-    if (client && booking.clientId === client.id) {
-      senderId = client.id;
-      senderType = "client";
-    } else if (professional && booking.professionalId === professional.id) {
-      senderId = professional.id;
-      senderType = "professional";
+    // Si senderId et senderType sont fournis dans le body, les utiliser (pour la compatibilité)
+    if (providedSenderId && providedSenderType) {
+      // Vérifier que l'utilisateur a le droit d'envoyer ce message
+      if (client && booking.clientId === client.id && providedSenderType === "client" && providedSenderId === client.id) {
+        senderId = client.id;
+        senderType = "client";
+      } else if (professional && booking.professionalId === professional.id && providedSenderType === "professional" && providedSenderId === professional.id) {
+        senderId = professional.id;
+        senderType = "professional";
+      } else {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+      }
     } else {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+      // Déterminer automatiquement
+      if (client && booking.clientId === client.id) {
+        senderId = client.id;
+        senderType = "client";
+      } else if (professional && booking.professionalId === professional.id) {
+        senderId = professional.id;
+        senderType = "professional";
+      } else {
+        return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
+      }
     }
 
     const message = await prisma.message.create({

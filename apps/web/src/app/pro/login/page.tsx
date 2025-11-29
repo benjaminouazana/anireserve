@@ -118,6 +118,12 @@ export default function ProLoginPage() {
 
           <div className="mt-6 text-center space-y-2">
             <Link
+              href="/pro/forgot-password"
+              className="block text-sm font-medium text-zinc-700 hover:text-zinc-900 transition"
+            >
+              Mot de passe oublié ?
+            </Link>
+            <Link
               href="/pro/register"
               className="block text-sm font-medium text-zinc-700 hover:text-zinc-900 transition"
             >

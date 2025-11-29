@@ -189,3 +189,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 - Framework : Next.js 15 avec App Router
 - Styling : Tailwind CSS avec mode sombre
 
+
+
+

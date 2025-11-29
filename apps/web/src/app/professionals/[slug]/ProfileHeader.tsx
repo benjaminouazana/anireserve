@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 function StarIcon({ filled }: { filled: boolean }) {
   return (
     <svg
@@ -28,12 +30,14 @@ export function ProfileHeader({
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
         {/* Image de profil */}
         <div className="flex-shrink-0">
-          <div className="h-24 w-24 overflow-hidden rounded-full bg-zinc-200 sm:h-32 sm:w-32">
+          <div className="h-24 w-24 overflow-hidden rounded-full bg-zinc-200 sm:h-32 sm:w-32 relative">
             {professional.profileImage ? (
-              <img
+              <Image
                 src={professional.profileImage}
                 alt={professional.name}
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 96px, 128px"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-zinc-400">

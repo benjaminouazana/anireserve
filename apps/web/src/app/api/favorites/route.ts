@@ -19,15 +19,58 @@ export async function GET() {
             name: true,
             serviceType: true,
             city: true,
+            cities: true,
+            description: true,
             profileImage: true,
-            averageRating: true,
+            verified: true,
+            _count: {
+              select: {
+                reviews: true,
+              },
+            },
           },
         },
       },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(favorites);
+    // Calculer les notes moyennes
+    const professionalIds = favorites.map((f) => f.professional.id);
+    const ratingsData = professionalIds.length > 0
+      ? await prisma.review.groupBy({
+          by: ["professionalId"],
+          where: {
+            professionalId: { in: professionalIds },
+          },
+          _avg: {
+            rating: true,
+          },
+          _count: {
+            rating: true,
+          },
+        })
+      : [];
+
+    const ratingsMap = new Map(
+      ratingsData.map((r) => [r.professionalId, { avg: r._avg.rating || 0, count: r._count.rating }])
+    );
+
+    const favoritesWithRatings = favorites.map((fav) => {
+      const ratingData = ratingsMap.get(fav.professional.id) || { avg: 0, count: 0 };
+      return {
+        id: fav.professional.id,
+        name: fav.professional.name,
+        city: fav.professional.city,
+        cities: fav.professional.cities,
+        serviceType: fav.professional.serviceType,
+        description: fav.professional.description,
+        averageRating: ratingData.avg,
+        totalReviews: ratingData.count,
+        verified: fav.professional.verified,
+      };
+    });
+
+    return NextResponse.json({ favorites: favoritesWithRatings });
   } catch (error: any) {
     console.error("Erreur API /api/favorites:", error);
     return NextResponse.json(
@@ -107,7 +150,17 @@ export async function DELETE(req: Request) {
     }
 
     const { searchParams } = new URL(req.url);
-    const professionalId = searchParams.get("professionalId");
+    let professionalId = searchParams.get("professionalId");
+
+    // Si pas dans les query params, chercher dans le body
+    if (!professionalId) {
+      try {
+        const body = await req.json();
+        professionalId = body.professionalId?.toString();
+      } catch {
+        // Body vide ou invalide
+      }
+    }
 
     if (!professionalId) {
       return NextResponse.json(

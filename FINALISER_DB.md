@@ -58,3 +58,6 @@ npm run dev --workspace web
 
 **Erreur Prisma client** : Lance `npx prisma generate`.
 
+
+
+

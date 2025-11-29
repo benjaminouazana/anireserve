@@ -118,6 +118,12 @@ export default function ClientLoginPage() {
 
           <div className="mt-6 text-center space-y-2">
             <Link
+              href="/client/forgot-password"
+              className="block text-sm font-medium text-zinc-700 hover:text-zinc-900 transition"
+            >
+              Mot de passe oublié ?
+            </Link>
+            <Link
               href="/client/register"
               className="block text-sm font-medium text-zinc-700 hover:text-zinc-900 transition"
             >

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type BookingActionsProps = {
   bookingId: number;
@@ -39,7 +40,14 @@ export function BookingActions({ bookingId, currentStatus }: BookingActionsProps
   }
 
   return (
-    <div className="flex gap-1.5">
+    <div className="flex gap-1.5 flex-wrap">
+      <Link
+        href={`/bookings/${bookingId}/chat`}
+        className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700 transition hover:bg-blue-100"
+        title="Ouvrir le chat"
+      >
+        💬
+      </Link>
       {currentStatus === "pending" && (
         <>
           <button

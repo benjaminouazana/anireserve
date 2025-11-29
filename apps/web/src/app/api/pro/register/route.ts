@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { generateUniqueSlug } from "@/lib/slug";
 
 export async function POST(req: Request) {
   try {
@@ -51,11 +52,23 @@ export async function POST(req: Request) {
     // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Générer un slug unique
+    const professionalName = name || `${firstName} ${lastName}`;
+    // Récupérer tous les professionnels avec leurs slugs
+    const allProfessionals = await prisma.professional.findMany({
+      select: { slug: true },
+    });
+    // Filtrer les slugs non-null
+    const existingSlugs = allProfessionals
+      .map((p) => p.slug)
+      .filter((s): s is string => s !== null && s !== undefined);
+    const slug = generateUniqueSlug(professionalName, existingSlugs);
+
     const professional = await prisma.professional.create({
       data: {
         firstName,
         lastName,
-        name: name || `${firstName} ${lastName}`,
+        name: professionalName,
         email,
         password: hashedPassword,
         phone: phone || null,
@@ -68,6 +81,7 @@ export async function POST(req: Request) {
         teoudatZeout: teoudatZeout || null,
         languages: languages || "fr",
         status: status || "pending", // Statut par défaut : en attente
+        slug, // Ajouter le slug
       },
       select: {
         id: true,

@@ -38,3 +38,6 @@ Les emails fonctionnent automatiquement :
 
 **Note** : Si `RESEND_API_KEY` n'est pas configuré, les emails sont simulés dans la console (pour le développement).
 
+
+
+

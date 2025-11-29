@@ -4,15 +4,20 @@ import Link from "next/link";
 import { ReviewsSection } from "./ReviewsSection";
 import { ProfileHeader } from "./ProfileHeader";
 import { CalendarView } from "./CalendarView";
+import { Gallery } from "./Gallery";
+import { generateMetadata } from "./metadata";
+import { generateSlug } from "@/lib/slug";
+
+export { generateMetadata };
 
 export default async function ProfessionalProfilePage({
   params,
 }: {
-  params: { id: string };
+  params: { slug: string };
 }) {
-  // Récupérer le professionnel et ses avis séparément pour éviter les problèmes de cache
+  // Récupérer le professionnel par son slug
   const professional = await prisma.professional.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { slug: params.slug },
   });
 
   if (!professional) {
@@ -41,6 +46,16 @@ export default async function ProfessionalProfilePage({
   const gallery = professional.gallery
     ? professional.gallery.split(",").map((url) => url.trim()).filter(Boolean)
     : [];
+
+  // Parser les prix
+  let pricing: Record<string, number> = {};
+  if (professional.pricing) {
+    try {
+      pricing = JSON.parse(professional.pricing);
+    } catch (e) {
+      // Si le parsing échoue, on laisse pricing vide
+    }
+  }
 
   // Calculer la moyenne des notes
   const averageRating =
@@ -78,27 +93,7 @@ export default async function ProfessionalProfilePage({
         )}
 
         {/* Galerie de photos */}
-        {gallery.length > 0 && (
-          <div className="border-b border-zinc-200 bg-white px-4 py-6 sm:px-8">
-            <h2 className="mb-4 text-lg font-semibold text-zinc-900">
-              Galerie
-            </h2>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {gallery.map((url, index) => (
-                <div
-                  key={index}
-                  className="aspect-square overflow-hidden rounded-lg bg-zinc-100"
-                >
-                  <img
-                    src={url}
-                    alt={`Photo ${index + 1} de ${professional.name}`}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <Gallery images={gallery} professionalName={professional.name} />
 
         {/* Informations de contact */}
         <div className="border-b border-zinc-200 bg-white px-4 py-6 sm:px-8">
@@ -136,6 +131,26 @@ export default async function ProfessionalProfilePage({
               <span className="font-medium text-zinc-700">Service :</span>
               <p className="text-zinc-600">{professional.serviceType}</p>
             </div>
+
+            {/* Prix */}
+            {Object.keys(pricing).length > 0 && (
+              <div>
+                <span className="font-medium text-zinc-700">Tarifs :</span>
+                <div className="mt-2 space-y-2">
+                  {Object.entries(pricing).map(([service, price]) => (
+                    <div
+                      key={service}
+                      className="flex items-center justify-between rounded-lg bg-zinc-50 px-3 py-2"
+                    >
+                      <span className="text-sm text-zinc-700">{service}</span>
+                      <span className="text-sm font-semibold text-primary">
+                        {typeof price === "number" ? `${price} ₪` : price}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -157,7 +172,7 @@ export default async function ProfessionalProfilePage({
         {/* Bouton de réservation */}
         <div className="sticky bottom-0 border-t border-zinc-200 bg-white px-4 py-4 sm:px-8">
           <Link
-            href={`/?proId=${professional.id}`}
+            href={`/?proSlug=${professional.slug || generateSlug(professional.name)}`}
             className="flex w-full items-center justify-center rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
           >
             Réserver un rendez-vous

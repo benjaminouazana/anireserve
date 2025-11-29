@@ -11,3 +11,6 @@ export default async function AdminPendingProfessionalsPage() {
   return <AdminPendingProfessionalsContent admin={admin} />;
 }
 
+
+
+

@@ -10,6 +10,12 @@ export async function GET(req: Request) {
     const minRating = searchParams.get("minRating") || undefined;
     const availableToday = searchParams.get("availableToday") === "true";
     const sortBy = searchParams.get("sortBy") || "name";
+    const keyword = searchParams.get("keyword") || undefined; // Recherche par mots-clés
+    
+    // Pagination
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
+    const skip = (page - 1) * limit;
 
     // Construire les conditions de recherche
     const whereConditions: any = {
@@ -19,8 +25,8 @@ export async function GET(req: Request) {
     // Recherche par ville (ville principale ou villes multiples)
     if (city) {
       whereConditions.OR = [
-        { city: { contains: city } },
-        { cities: { contains: city } },
+        { city: { contains: city, mode: "insensitive" } },
+        { cities: { contains: city, mode: "insensitive" } },
       ];
     }
 
@@ -33,8 +39,31 @@ export async function GET(req: Request) {
     if (subcategory) {
       whereConditions.subcategories = {
         contains: subcategory,
+        mode: "insensitive",
       };
     }
+
+    // Recherche par mots-clés dans la description
+    if (keyword) {
+      // Si on a déjà un OR (pour la ville), on doit combiner avec AND
+      if (whereConditions.OR) {
+        whereConditions.AND = [
+          { OR: whereConditions.OR },
+          { description: { contains: keyword, mode: "insensitive" } },
+        ];
+        delete whereConditions.OR;
+      } else {
+        whereConditions.description = {
+          contains: keyword,
+          mode: "insensitive",
+        };
+      }
+    }
+
+    // Compter le total avant pagination
+    const totalCount = await prisma.professional.count({
+      where: whereConditions,
+    });
 
     // Optimisation : utiliser select au lieu de include et _count pour les comptages
     const professionals = await prisma.professional.findMany({
@@ -42,6 +71,7 @@ export async function GET(req: Request) {
       select: {
         id: true,
         name: true,
+        slug: true,
         city: true,
         cities: true,
         serviceType: true,
@@ -66,7 +96,9 @@ export async function GET(req: Request) {
           },
         },
       },
-      take: 100, // Limiter les résultats
+      skip,
+      take: limit,
+      orderBy: sortBy === "rating" ? undefined : sortBy === "reviews" ? undefined : { name: "asc" },
     });
 
     // Calculer les notes moyennes avec une seule requête agrégée
@@ -162,15 +194,34 @@ export async function GET(req: Request) {
       };
     });
 
-    const response = NextResponse.json(data);
+    const response = NextResponse.json({
+      professionals: data,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasMore: page * limit < totalCount,
+      },
+    });
     // Cache pour 30 secondes (les données changent peu souvent)
     response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erreur API /api/professionals:", error);
+    // Retourner toujours un format valide même en cas d'erreur
     return NextResponse.json(
-      { error: "Erreur lors de la récupération des professionnels" },
-      { status: 500 }
+      { 
+        professionals: [],
+        pagination: {
+          page: 1,
+          limit: 20,
+          total: 0,
+          totalPages: 0,
+          hasMore: false,
+        }
+      },
+      { status: 200 } // Retourner 200 pour que le client puisse gérer l'erreur
     );
   }
 }

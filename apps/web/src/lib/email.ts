@@ -300,3 +300,139 @@ export async function sendBookingCancelledEmailToPro(
   }
 }
 
+// Email pour réinitialisation de mot de passe (client)
+export async function sendPasswordResetEmail(
+  to: string,
+  clientName: string,
+  resetToken: string
+) {
+  try {
+    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Réinitialisation mot de passe envoyée à", to);
+      return { success: true, simulated: true };
+    }
+
+    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/client/reset-password?token=${resetToken}`;
+
+    await resend.emails.send({
+      from: "AniReserve <noreply@anireserve.com>",
+      to,
+      subject: "Réinitialisation de votre mot de passe",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #7c3aed;">🔐 Réinitialisation de mot de passe</h1>
+          <p>Bonjour ${clientName},</p>
+          <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
+          <p style="margin: 30px 0;">
+            <a href="${resetUrl}" 
+               style="background: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+              Réinitialiser mon mot de passe
+            </a>
+          </p>
+          <p>Ce lien est valide pendant 1 heure.</p>
+          <p style="color: #71717a; font-size: 12px; margin-top: 30px;">AniReserve - La plateforme de réservation en Israël pour les Français</p>
+        </div>
+      `,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur envoi email:", error);
+    return { success: false, error };
+  }
+}
+
+// Email pour réinitialisation de mot de passe (professionnel)
+export async function sendProfessionalPasswordResetEmail(
+  to: string,
+  professionalName: string,
+  resetToken: string
+) {
+  try {
+    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Réinitialisation mot de passe pro envoyée à", to);
+      return { success: true, simulated: true };
+    }
+
+    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pro/reset-password?token=${resetToken}`;
+
+    await resend.emails.send({
+      from: "AniReserve <noreply@anireserve.com>",
+      to,
+      subject: "Réinitialisation de votre mot de passe professionnel",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #ec4899;">🔐 Réinitialisation de mot de passe</h1>
+          <p>Bonjour ${professionalName},</p>
+          <p>Vous avez demandé à réinitialiser votre mot de passe professionnel.</p>
+          <p style="margin: 30px 0;">
+            <a href="${resetUrl}" 
+               style="background: #ec4899; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
+              Réinitialiser mon mot de passe
+            </a>
+          </p>
+          <p>Ce lien est valide pendant 1 heure.</p>
+          <p style="color: #71717a; font-size: 12px; margin-top: 30px;">AniReserve - La plateforme de réservation en Israël pour les Français</p>
+        </div>
+      `,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur envoi email:", error);
+    return { success: false, error };
+  }
+}
+
+// Email générique pour changement de statut de réservation
+export async function sendBookingStatusChangeEmail(
+  to: string,
+  recipientName: string,
+  professionalName: string,
+  clientName: string,
+  date: string,
+  time: string,
+  status: "confirmed" | "cancelled"
+) {
+  try {
+    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Changement de statut envoyé à", to);
+      return { success: true, simulated: true };
+    }
+
+    const isConfirmed = status === "confirmed";
+    const subject = isConfirmed 
+      ? `✅ Réservation confirmée avec ${professionalName}`
+      : `❌ Réservation annulée avec ${professionalName}`;
+    
+    const title = isConfirmed ? "✅ Réservation confirmée !" : "❌ Réservation annulée";
+    const color = isConfirmed ? "#10b981" : "#ef4444";
+    const bgColor = isConfirmed ? "#ecfdf5" : "#fef2f2";
+
+    await resend.emails.send({
+      from: "AniReserve <noreply@anireserve.com>",
+      to,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: ${color};">${title}</h1>
+          <p>Bonjour ${recipientName},</p>
+          <p>La réservation avec <strong>${professionalName}</strong> a été ${isConfirmed ? "confirmée" : "annulée"}.</p>
+          <div style="background: ${bgColor}; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid ${color};">
+            <p style="margin: 0;"><strong>📅 Date :</strong> ${date}</p>
+            <p style="margin: 5px 0;"><strong>⏰ Heure :</strong> ${time}</p>
+            <p style="margin: 5px 0;"><strong>👤 ${isConfirmed ? "Professionnel" : "Client"} :</strong> ${isConfirmed ? professionalName : clientName}</p>
+          </div>
+          ${isConfirmed ? '<p><strong>💳 Important :</strong> Le paiement se fera sur place au moment de la prestation.</p>' : '<p>Vous pouvez réserver un autre créneau si vous le souhaitez.</p>'}
+          <p style="color: #71717a; font-size: 12px; margin-top: 30px;">AniReserve - La plateforme de réservation en Israël pour les Français</p>
+        </div>
+      `,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur envoi email:", error);
+    return { success: false, error };
+  }
+}
+

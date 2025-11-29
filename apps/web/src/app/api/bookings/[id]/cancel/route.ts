@@ -88,10 +88,11 @@ export async function POST(
       await sendBookingStatusChangeEmail(
         booking.professional.email,
         booking.professional.name,
+        booking.professional.name,
         booking.client.name,
-        "cancelled",
         dateStr,
-        timeStr
+        timeStr,
+        "cancelled"
       );
     } catch (error) {
       console.error("Erreur envoi email:", error);

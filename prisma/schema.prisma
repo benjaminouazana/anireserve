@@ -8,47 +8,53 @@ datasource db {
 }
 
 model Professional {
-  id               Int        @id @default(autoincrement())
-  name             String
-  email            String     @unique
-  password         String
-  city             String
-  serviceType      String
-  description      String?
-  languages        String
-  availability     String?
-  cities           String?
-  phone            String?
-  bio              String?
-  gallery          String?
-  profileImage     String?
-  breakEnd         String?
-  breakStart       String?
-  closedDays       String?
-  badge            String?
-  subscriptionPlan String?
-  verified         Boolean    @default(false)
-  subcategories    String?
-  createdAt        DateTime   @default(now())
-  firstName        String?
-  lastName         String?
-  rejectionReason  String?
-  services         String?
-  status           String     @default("pending")
-  teoudatZeout     String?
-  bookings         Booking[]
-  favorites        Favorite[]
-  reviews          Review[]
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  email                String     @unique
+  password             String
+  city                 String
+  serviceType          String
+  description          String?
+  languages            String
+  availability         String?
+  cities               String?
+  phone                String?
+  bio                  String?
+  gallery              String?
+  profileImage         String?
+  breakEnd             String?
+  breakStart           String?
+  closedDays           String?
+  badge                String?
+  subscriptionPlan     String?
+  verified             Boolean    @default(false)
+  subcategories        String?
+  createdAt            DateTime   @default(now())
+  firstName            String?
+  lastName             String?
+  rejectionReason      String?
+  services             String?
+  status               String     @default("pending")
+  teoudatZeout         String?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  pricing              String? // JSON string pour stocker les prix par service
+  slug                 String? @unique // Slug pour l'URL (ex: "Avi-Rosen")
+  bookings             Booking[]
+  favorites            Favorite[]
+  reviews              Review[]
 }
 
 model Client {
-  id        Int        @id @default(autoincrement())
-  name      String
-  email     String     @unique
-  password  String?
-  bookings  Booking[]
-  favorites Favorite[]
-  reviews   Review[]
+  id                   Int        @id @default(autoincrement())
+  name                 String
+  email                String     @unique
+  password             String?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  bookings             Booking[]
+  favorites            Favorite[]
+  reviews              Review[]
 }
 
 model Booking {

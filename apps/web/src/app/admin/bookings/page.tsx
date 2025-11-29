@@ -12,3 +12,6 @@ export default async function AdminBookingsPage() {
   return <AdminBookingsContent admin={admin} />;
 }
 
+
+
+

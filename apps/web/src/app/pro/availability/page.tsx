@@ -64,13 +64,19 @@ export default function AvailabilityPage() {
   }, []);
 
   function updateDay(day: keyof Availability, field: keyof DaySchedule, value: any) {
-    setAvailability((prev) => ({
-      ...prev,
-      [day]: {
-        ...prev[day],
-        [field]: value,
-      },
-    }));
+    setAvailability((prev) => {
+      const daySchedule = prev[day];
+      if (!daySchedule || typeof daySchedule !== 'object') {
+        return prev;
+      }
+      return {
+        ...prev,
+        [day]: {
+          ...daySchedule,
+          [field]: value,
+        },
+      };
+    });
   }
 
   async function handleSubmit(e: React.FormEvent) {

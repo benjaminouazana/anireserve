@@ -60,3 +60,6 @@ export function FavoriteButton({ professionalId }: { professionalId: number }) {
   );
 }
 
+
+
+

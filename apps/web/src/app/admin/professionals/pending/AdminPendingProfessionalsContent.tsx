@@ -35,6 +35,8 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
   const [selectedPro, setSelectedPro] = useState<Professional | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [processing, setProcessing] = useState<number | null>(null);
+  const [viewingDocument, setViewingDocument] = useState<string | null>(null);
+  const [documentError, setDocumentError] = useState(false);
 
   useEffect(() => {
     loadProfessionals();
@@ -216,14 +218,15 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
                         <label className="block text-sm font-medium text-zinc-700 mb-2">
                           Teoudate Zeoute:
                         </label>
-                        <a
-                          href={pro.teoudatZeout}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => {
+                            setViewingDocument(pro.teoudatZeout);
+                            setDocumentError(false);
+                          }}
                           className="inline-flex items-center gap-2 rounded-full bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium hover:bg-blue-200 transition"
                         >
                           📄 Voir le document
-                        </a>
+                        </button>
                       </div>
                     )}
 
@@ -282,6 +285,114 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
           </div>
         )}
       </div>
+
+      {/* Modal pour afficher le document */}
+      {viewingDocument && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4"
+          onClick={() => setViewingDocument(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] w-full bg-white rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-zinc-900">
+                📄 Teoudate Zeoute
+              </h3>
+              <button
+                onClick={() => setViewingDocument(null)}
+                className="text-zinc-500 hover:text-zinc-700 text-2xl font-bold transition"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4 overflow-auto max-h-[calc(90vh-80px)] flex items-center justify-center bg-gray-50">
+              {documentError ? (
+                <div className="text-center p-8">
+                  <p className="text-zinc-600 font-semibold mb-4">
+                    Impossible d'afficher le document directement
+                  </p>
+                  <p className="text-sm text-zinc-500 mb-4">
+                    Le document peut être une image ou un PDF. Cliquez sur le lien ci-dessous pour l'ouvrir.
+                  </p>
+                  <a
+                    href={viewingDocument || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+                  >
+                    📄 Ouvrir le document dans un nouvel onglet
+                  </a>
+                </div>
+              ) : (() => {
+                // Détecter si c'est une URL placeholder (mode développement)
+                const isPlaceholder = viewingDocument.includes('via.placeholder.com') || viewingDocument.includes('placeholder.com');
+                
+                if (isPlaceholder) {
+                  return (
+                    <div className="text-center p-8">
+                      <div className="mb-4">
+                        <div className="text-6xl mb-4">📄</div>
+                        <p className="text-zinc-600 font-semibold mb-2">
+                          Document de test (mode développement)
+                        </p>
+                        <p className="text-sm text-zinc-500 mb-4">
+                          En production, le document Teoudate Zeoute sera stocké sur Supabase et affiché ici.
+                        </p>
+                        <p className="text-xs text-zinc-400 mb-4">
+                          URL: {viewingDocument.substring(0, 80)}...
+                        </p>
+                      </div>
+                      <a
+                        href={viewingDocument}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+                      >
+                        📄 Essayer d'ouvrir l'URL
+                      </a>
+                    </div>
+                  );
+                }
+                
+                // Extraire l'extension du fichier même avec des paramètres de requête
+                const urlWithoutParams = viewingDocument.split('?')[0];
+                const extension = urlWithoutParams.split('.').pop()?.toLowerCase() || '';
+                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'bmp', 'svg'].includes(extension);
+                const isPdf = extension === 'pdf';
+                
+                // Utiliser l'URL proxy pour éviter les problèmes CORS (sauf pour les placeholders)
+                const proxyUrl = `/api/admin/document?url=${encodeURIComponent(viewingDocument)}`;
+                
+                // Si c'est un PDF, afficher dans un iframe
+                if (isPdf) {
+                  return (
+                    <iframe
+                      src={proxyUrl}
+                      className="w-full h-[calc(90vh-120px)] rounded-lg shadow-lg"
+                      title="Teoudate Zeoute PDF"
+                      onError={() => setDocumentError(true)}
+                    />
+                  );
+                }
+                
+                // Pour les images ou formats inconnus, essayer d'abord comme image
+                // Utiliser l'URL proxy pour éviter les problèmes CORS
+                return (
+                  <img
+                    src={proxyUrl}
+                    alt="Teoudate Zeoute"
+                    className="max-w-full max-h-[calc(90vh-200px)] object-contain rounded-lg shadow-lg mx-auto"
+                    onError={() => setDocumentError(true)}
+                    onLoad={() => setDocumentError(false)}
+                  />
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

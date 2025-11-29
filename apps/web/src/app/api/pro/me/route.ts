@@ -24,6 +24,7 @@ export async function GET(req: Request) {
         bio: true,
         profileImage: true,
         gallery: true,
+        pricing: true,
       },
     });
 
@@ -36,4 +37,7 @@ export async function GET(req: Request) {
     );
   }
 }
+
+
+
 

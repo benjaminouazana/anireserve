@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ClientLogoutButton } from "./ClientLogoutButton";
 import { CancelBookingButton } from "./CancelBookingButton";
+import { generateSlug } from "@/lib/slug";
+
+// Fonction pour obtenir le slug d'un professionnel
+function getProfessionalSlug(pro: any): string {
+  if (pro.slug) return pro.slug;
+  return generateSlug(pro.name);
+}
 
 type Booking = {
   id: number;
@@ -187,7 +194,7 @@ export default function MyBookingsPage() {
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <Link
-                          href={`/professionals/${booking.professional.id}`}
+                          href={`/professionals/${getProfessionalSlug(booking.professional)}`}
                           className="text-xs text-zinc-500 hover:text-zinc-700 transition"
                         >
                           Voir le profil →
@@ -195,7 +202,7 @@ export default function MyBookingsPage() {
                         {booking.status === "confirmed" && (
                           <>
                             <Link
-                              href={`/professionals/${booking.professional.id}?review=${booking.id}`}
+                              href={`/professionals/${getProfessionalSlug(booking.professional)}?review=${booking.id}`}
                               className="text-xs text-emerald-600 hover:text-emerald-700 transition font-medium"
                             >
                               Laisser un avis ⭐

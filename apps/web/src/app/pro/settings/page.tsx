@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfessional } from "@/lib/auth";
 import { ImageUploadButton } from "./ImageUploadButton";
+import { useToast } from "@/components/ToastProvider";
 
 export default function ProSettingsPage() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [professional, setProfessional] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -15,10 +17,19 @@ export default function ProSettingsPage() {
     profileImage: "",
     gallery: "",
     phone: "",
+    pricing: "",
   });
+  const [pricingEntries, setPricingEntries] = useState<Array<{service: string; price: string}>>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     async function loadProfessional() {
@@ -30,11 +41,30 @@ export default function ProSettingsPage() {
         }
         const data = await response.json();
         setProfessional(data);
+        
+        // Parser les prix existants
+        let existingPricing: Record<string, number> = {};
+        if (data.pricing) {
+          try {
+            existingPricing = JSON.parse(data.pricing);
+          } catch (e) {
+            // Ignorer les erreurs de parsing
+          }
+        }
+        
+        setPricingEntries(
+          Object.entries(existingPricing).map(([service, price]) => ({
+            service,
+            price: price.toString(),
+          }))
+        );
+        
         setFormData({
           bio: data.bio || "",
           profileImage: data.profileImage || "",
           gallery: data.gallery || "",
           phone: data.phone || "",
+          pricing: data.pricing || "",
         });
       } catch (err) {
         router.push("/pro/login");
@@ -45,6 +75,19 @@ export default function ProSettingsPage() {
     loadProfessional();
   }, [router]);
 
+  function updatePricing() {
+    const pricingObj: Record<string, number> = {};
+    pricingEntries.forEach((entry) => {
+      if (entry.service.trim() && entry.price.trim()) {
+        const price = parseFloat(entry.price);
+        if (!isNaN(price) && price > 0) {
+          pricingObj[entry.service.trim()] = price;
+        }
+      }
+    });
+    return JSON.stringify(pricingObj);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -52,10 +95,14 @@ export default function ProSettingsPage() {
     setSuccess(false);
 
     try {
+      const pricingJson = updatePricing();
       const response = await fetch("/api/pro/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          pricing: pricingJson,
+        }),
       });
 
       if (!response.ok) {
@@ -69,6 +116,50 @@ export default function ProSettingsPage() {
       setError(err.message || "Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault();
+    
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.showToast("Les mots de passe ne correspondent pas", "error");
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast.showToast("Le mot de passe doit contenir au moins 6 caractères", "error");
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const response = await fetch("/api/pro/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erreur lors du changement de mot de passe");
+      }
+
+      toast.showToast("Mot de passe modifié avec succès", "success");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setShowPasswordForm(false);
+    } catch (error: any) {
+      toast.showToast(error.message || "Erreur lors du changement de mot de passe", "error");
+    } finally {
+      setPasswordLoading(false);
     }
   }
 
@@ -191,6 +282,66 @@ export default function ProSettingsPage() {
               />
             </div>
 
+            {/* Section Prix */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-zinc-800">
+                Tarifs par service
+              </label>
+              <div className="space-y-3">
+                {pricingEntries.map((entry, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={entry.service}
+                      onChange={(e) => {
+                        const newEntries = [...pricingEntries];
+                        newEntries[index].service = e.target.value;
+                        setPricingEntries(newEntries);
+                      }}
+                      className="flex-1 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                      placeholder="Nom du service (ex: Consultation)"
+                    />
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={entry.price}
+                      onChange={(e) => {
+                        const newEntries = [...pricingEntries];
+                        newEntries[index].price = e.target.value;
+                        setPricingEntries(newEntries);
+                      }}
+                      className="w-32 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                      placeholder="Prix (₪)"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPricingEntries(
+                          pricingEntries.filter((_, i) => i !== index)
+                        );
+                      }}
+                      className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 transition hover:bg-red-100"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPricingEntries([...pricingEntries, { service: "", price: "" }]);
+                  }}
+                  className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition hover:border-zinc-400 hover:bg-zinc-50"
+                >
+                  + Ajouter un service
+                </button>
+              </div>
+              <p className="text-xs text-zinc-500">
+                Ajoute tes tarifs pour chaque service que tu proposes
+              </p>
+            </div>
+
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {error}
@@ -211,6 +362,88 @@ export default function ProSettingsPage() {
               {saving ? "Sauvegarde..." : "Sauvegarder les modifications"}
             </button>
           </form>
+        </div>
+
+        {/* Section changement de mot de passe */}
+        <div className="mt-6 rounded-2xl bg-white p-8 shadow-sm ring-1 ring-zinc-100">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xl font-semibold tracking-tight text-zinc-950">
+                Sécurité
+              </h2>
+              <p className="mt-2 text-sm text-zinc-500">
+                Modifier ton mot de passe
+              </p>
+            </div>
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50"
+            >
+              {showPasswordForm ? "Annuler" : "Modifier le mot de passe"}
+            </button>
+          </div>
+
+          {showPasswordForm && (
+            <form onSubmit={handlePasswordChange} className="mt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 mb-1">
+                  Mot de passe actuel
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                  }
+                  required
+                  className="block w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 mb-1">
+                  Nouveau mot de passe
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, newPassword: e.target.value })
+                  }
+                  required
+                  minLength={6}
+                  className="block w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                />
+                <p className="mt-1 text-xs text-zinc-500">
+                  Au moins 6 caractères
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-800 mb-1">
+                  Confirmer le nouveau mot de passe
+                </label>
+                <input
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                  }
+                  required
+                  minLength={6}
+                  className="block w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={passwordLoading}
+                className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {passwordLoading ? "Modification..." : "Modifier le mot de passe"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

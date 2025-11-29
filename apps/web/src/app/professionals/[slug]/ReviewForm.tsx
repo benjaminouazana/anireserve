@@ -2,11 +2,23 @@
 
 import { useState } from "react";
 
-function StarIcon({ filled, onClick }: { filled: boolean; onClick?: () => void }) {
+function StarIcon({ 
+  filled, 
+  onClick, 
+  onMouseEnter, 
+  onMouseLeave 
+}: { 
+  filled: boolean; 
+  onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       className={`h-6 w-6 transition ${
         filled ? "text-amber-400" : "text-zinc-300 hover:text-amber-200"
       }`}

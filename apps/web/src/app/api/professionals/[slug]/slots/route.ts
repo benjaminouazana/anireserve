@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const { searchParams } = new URL(req.url);
     const date = searchParams.get("date");
 
@@ -17,7 +18,7 @@ export async function GET(
     }
 
     const professional = await prisma.professional.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { slug },
       select: {
         availability: true,
         breakStart: true,
@@ -121,10 +122,12 @@ export async function GET(
         // Exclure les réservations annulées
         if (booking.status === "cancelled") return false;
         
+        // Utiliser UTC pour éviter les problèmes de timezone
         const bookingStart = new Date(booking.startTime);
         const bookingEnd = new Date(booking.endTime);
-        const slotStart = new Date(`${date}T${startTimeStr}:00`);
-        const slotEnd = new Date(`${date}T${endTimeStr}:00`);
+        // Créer les dates en UTC pour la comparaison
+        const slotStart = new Date(`${date}T${startTimeStr}:00Z`);
+        const slotEnd = new Date(`${date}T${endTimeStr}:00Z`);
         
         // Vérifier chevauchement (inclut les réservations en attente et confirmées)
         return (
@@ -146,7 +149,10 @@ export async function GET(
       }
     }
 
-    return NextResponse.json({ availableSlots: slots });
+    const response = NextResponse.json({ availableSlots: slots });
+    // Cache pour 10 secondes (les créneaux changent souvent)
+    response.headers.set("Cache-Control", "public, s-maxage=10, stale-while-revalidate=30");
+    return response;
   } catch (error: any) {
     console.error("Erreur API /api/professionals/[id]/slots:", error);
     return NextResponse.json(

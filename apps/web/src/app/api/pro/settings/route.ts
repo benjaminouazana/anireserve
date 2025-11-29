@@ -10,7 +10,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
     }
 
-    const { bio, profileImage, gallery, phone } = await req.json();
+    const { bio, profileImage, gallery, phone, pricing } = await req.json();
 
     const updated = await prisma.professional.update({
       where: { id: professional.id },
@@ -19,6 +19,7 @@ export async function PATCH(req: Request) {
         ...(profileImage !== undefined && { profileImage }),
         ...(gallery !== undefined && { gallery }),
         ...(phone !== undefined && { phone }),
+        ...(pricing !== undefined && { pricing }),
       },
       select: {
         id: true,
@@ -27,6 +28,7 @@ export async function PATCH(req: Request) {
         profileImage: true,
         gallery: true,
         phone: true,
+        pricing: true,
       },
     });
 
@@ -42,4 +44,7 @@ export async function PATCH(req: Request) {
     );
   }
 }
+
+
+
 
