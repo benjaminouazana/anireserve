@@ -176,7 +176,13 @@ export async function GET(req: Request) {
       return NextResponse.json([]);
     }
 
-    const bookings = client.bookings.map((booking) => ({
+    const bookings = client.bookings.map((booking: {
+      id: number;
+      professional: { id: number; name: string; serviceType: string; city: string };
+      startTime: Date;
+      endTime: Date;
+      status: string;
+    }) => ({
       id: booking.id,
       professional: booking.professional,
       startTime: booking.startTime.toISOString(),
