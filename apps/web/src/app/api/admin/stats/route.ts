@@ -99,11 +99,11 @@ export async function GET() {
         bookingsByStatus,
         bookingsLast30Days,
       },
-      professionalsByService: professionalsByService.map((p) => ({
+      professionalsByService: professionalsByService.map((p: { serviceType: string; _count: { id: number } }) => ({
         service: p.serviceType,
         count: p._count.id,
       })),
-      professionalsByCity: professionalsByCity.map((p) => ({
+      professionalsByCity: professionalsByCity.map((p: { city: string; _count: { id: number } }) => ({
         city: p.city,
         count: p._count.id,
       })),
