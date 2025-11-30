@@ -11,11 +11,11 @@ import { generateSlug } from "@/lib/slug";
 
 export { generateMetadata };
 
-export default async function ProfessionalProfilePage({
-  params,
-}: {
+type PageProps = {
   params: { slug: string };
-}) {
+};
+
+export default async function ProfessionalProfilePage({ params }: PageProps) {
   // Récupérer le professionnel par son slug
   const { slug } = params;
   const professional = await prisma.professional.findUnique({
