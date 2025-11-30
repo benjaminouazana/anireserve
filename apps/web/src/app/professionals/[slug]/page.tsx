@@ -14,10 +14,10 @@ export { generateMetadata };
 export default async function ProfessionalProfilePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
   // Récupérer le professionnel par son slug
-  const { slug } = await params;
+  const { slug } = params;
   const professional = await prisma.professional.findUnique({
     where: { slug },
   });
