@@ -1,5 +1,7 @@
 # 🚀 Guide de Déploiement - AniReserve
 
+> ⚠️ **Pour une configuration Vercel + Hostinger (domaine + emails)**, voir le guide détaillé : **[GUIDE_DEPLOIEMENT_VERCEL.md](./GUIDE_DEPLOIEMENT_VERCEL.md)**
+
 ## 📋 Prérequis
 
 - [ ] Compte Vercel (ou autre plateforme)
