@@ -102,7 +102,7 @@ export default function AvailabilityPage() {
 
   function updateSlot(day: keyof Availability, slotIndex: number, field: "start" | "end", value: string) {
     setAvailability((prev) => {
-      const daySchedule = prev[day];
+      const daySchedule = prev[day] as DaySchedule;
       const newSlots = [...daySchedule.slots];
       newSlots[slotIndex] = { ...newSlots[slotIndex], [field]: value };
       return {
@@ -117,20 +117,20 @@ export default function AvailabilityPage() {
 
   function addSlot(day: keyof Availability) {
     setAvailability((prev) => {
-      const daySchedule = prev[day];
+      const daySchedule = prev[day] as DaySchedule;
       return {
         ...prev,
         [day]: {
           ...daySchedule,
           slots: [...daySchedule.slots, { start: "09:00", end: "10:00" }],
         },
-      };
+      } as Availability;
     });
   }
 
   function removeSlot(day: keyof Availability, slotIndex: number) {
     setAvailability((prev) => {
-      const daySchedule = prev[day];
+      const daySchedule = prev[day] as DaySchedule;
       const newSlots = daySchedule.slots.filter((_, i) => i !== slotIndex);
       return {
         ...prev,
@@ -138,7 +138,7 @@ export default function AvailabilityPage() {
           ...daySchedule,
           slots: newSlots.length > 0 ? newSlots : [{ start: "09:00", end: "10:00" }],
         },
-      };
+      } as Availability;
     });
   }
 
