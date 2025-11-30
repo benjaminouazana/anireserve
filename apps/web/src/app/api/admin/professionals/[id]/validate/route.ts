@@ -4,7 +4,7 @@ import { getCurrentAdmin } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const admin = await getCurrentAdmin();
@@ -12,7 +12,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params;
+    const { id } = params;
     const { action, rejectionReason } = await request.json(); // action: "approve" | "reject"
 
     if (action === "approve") {
