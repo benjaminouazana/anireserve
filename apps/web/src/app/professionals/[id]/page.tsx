@@ -12,11 +12,12 @@ export { generateMetadata };
 export default async function ProfessionalProfilePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   // Récupérer le professionnel et ses avis séparément pour éviter les problèmes de cache
+  const { id } = await params;
   const professional = await prisma.professional.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: parseInt(id) },
   });
 
   if (!professional) {
