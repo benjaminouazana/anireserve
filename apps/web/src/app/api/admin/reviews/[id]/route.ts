@@ -4,7 +4,7 @@ import { getCurrentAdmin } from "@/lib/auth";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const admin = await getCurrentAdmin();
@@ -12,7 +12,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const reviewId = parseInt(params.id);
+    const reviewId = parseInt(context.params.id);
 
     await prisma.review.delete({
       where: { id: reviewId },

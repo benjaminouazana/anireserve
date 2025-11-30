@@ -4,7 +4,7 @@ import { getCurrentAdmin } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const admin = await getCurrentAdmin();
@@ -13,7 +13,7 @@ export async function PATCH(
     }
 
     const { verified } = await request.json();
-    const professionalId = parseInt(params.id);
+    const professionalId = parseInt(context.params.id);
 
     const professional = await prisma.professional.update({
       where: { id: professionalId },
