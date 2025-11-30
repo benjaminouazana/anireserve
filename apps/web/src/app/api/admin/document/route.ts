@@ -63,8 +63,9 @@ export async function GET(req: Request) {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("Erreur route document:", errorMessage);
+    const errorMsg = error instanceof Error ? error.message : "Erreur lors de la récupération du document";
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération du document" },
+      { error: errorMsg },
       { status: 500 }
     );
   }

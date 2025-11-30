@@ -11,9 +11,9 @@ import { generateSlug } from "@/lib/slug";
 
 export { generateMetadata };
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   // Récupérer le professionnel par son slug
-  const { slug } = params;
+  const { slug } = await params;
   const professional = await prisma.professional.findUnique({
     where: { slug },
   });
