@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function ProLoginPage() {
+function ProLoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -154,6 +154,14 @@ export default function ProLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProLoginPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <ProLoginContent />
+    </Suspense>
   );
 }
 
