@@ -115,6 +115,9 @@ export async function POST(req: Request) {
     // Upload vers Supabase Storage (seulement si configuré et en production)
     try {
       const { supabase } = await import("@/lib/supabase");
+      if (!supabase) {
+        throw new Error("Supabase not configured");
+      }
       const fileExt = file.name.split(".").pop()?.toLowerCase();
       const timestamp = Date.now();
       const randomId = Math.random().toString(36).substring(2, 15);
