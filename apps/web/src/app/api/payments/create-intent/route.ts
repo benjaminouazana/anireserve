@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     // Créer un PaymentIntent avec Stripe
-    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === "") {
+    if (!stripe) {
       // Mode simulation
       return NextResponse.json({
         clientSecret: "simulated_secret",
