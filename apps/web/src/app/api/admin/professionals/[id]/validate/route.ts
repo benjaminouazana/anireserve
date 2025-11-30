@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAdmin } from "@/lib/auth";
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
     const admin = await getCurrentAdmin();
     if (!admin) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -17,7 +16,7 @@ export async function PATCH(
 
     if (action === "approve") {
       const professional = await prisma.professional.update({
-        where: { id: parseInt(id) },
+        where: { id: parseInt(params.id) },
         data: {
           status: "approved",
           rejectionReason: null,
@@ -45,7 +44,7 @@ export async function PATCH(
       }
 
       const professional = await prisma.professional.update({
-        where: { id: parseInt(id) },
+        where: { id: parseInt(params.id) },
         data: {
           status: "rejected",
           rejectionReason: rejectionReason.trim(),
