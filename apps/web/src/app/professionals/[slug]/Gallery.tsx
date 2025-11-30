@@ -18,9 +18,9 @@ export function Gallery({ images, professionalName }: GalleryProps) {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setSelectedImage(null);
-      } else if (e.key === "ArrowLeft" && selectedImage > 0) {
+      } else if (e.key === "ArrowLeft" && selectedImage !== null && selectedImage > 0) {
         setSelectedImage(selectedImage - 1);
-      } else if (e.key === "ArrowRight" && selectedImage < images.length - 1) {
+      } else if (e.key === "ArrowRight" && selectedImage !== null && selectedImage < images.length - 1) {
         setSelectedImage(selectedImage + 1);
       }
     }
