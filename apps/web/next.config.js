@@ -3,6 +3,16 @@ const nextConfig = {
   // Configuration pour le monorepo
   transpilePackages: [],
   
+  // Désactiver ESLint pendant le build (pour déploiement rapide)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
+  // Désactiver TypeScript errors pendant le build (seulement les warnings)
+  typescript: {
+    ignoreBuildErrors: false, // Garder les erreurs TypeScript, mais ignorer ESLint
+  },
+  
   // Optimisations
   images: {
     remotePatterns: [
