@@ -33,7 +33,7 @@ export async function GET() {
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("Erreur API /api/pro/me:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération du profil" },
+      { error: error instanceof Error ? error.message : "Erreur lors de la récupération du profil" },
       { status: 500 }
     );
   }

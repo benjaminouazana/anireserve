@@ -200,7 +200,7 @@ export async function GET(
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("Erreur API /api/professionals/[slug]/slots:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération des créneaux" },
+      { error: error instanceof Error ? error.message : "Erreur lors de la récupération des créneaux" },
       { status: 500 }
     );
   }

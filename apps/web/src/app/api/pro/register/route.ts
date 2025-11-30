@@ -120,7 +120,7 @@ export async function POST(req: Request) {
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("Erreur inscription pro:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la création du compte" },
+      { error: error instanceof Error ? error.message : "Erreur lors de la création du compte" },
       { status: 500 }
     );
   }

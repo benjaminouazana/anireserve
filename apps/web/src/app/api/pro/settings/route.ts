@@ -40,7 +40,7 @@ export async function PATCH(req: Request) {
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("Erreur API /api/pro/settings:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la mise à jour du profil" },
+      { error: error instanceof Error ? error.message : "Erreur lors de la mise à jour du profil" },
       { status: 500 }
     );
   }

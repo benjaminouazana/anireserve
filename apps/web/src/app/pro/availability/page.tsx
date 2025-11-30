@@ -63,10 +63,10 @@ export default function AvailabilityPage() {
               const dayData = parsed[day];
               if (dayData) {
                 if (dayData.slots && Array.isArray(dayData.slots)) {
-                  converted[day as keyof Availability] = dayData as DaySchedule;
+                  (converted as any)[day] = dayData as DaySchedule;
                 } else if (dayData.start && dayData.end) {
                   // Ancien format : convertir en nouveau format
-                  converted[day as keyof Availability] = {
+                  (converted as any)[day] = {
                     enabled: dayData.enabled || false,
                     slots: [{ start: dayData.start, end: dayData.end }],
                   };
@@ -93,10 +93,10 @@ export default function AvailabilityPage() {
       setAvailability((prev) => ({
         ...prev,
         [day]: {
-          ...prev[day],
+          ...(prev[day] as DaySchedule),
           enabled: value,
         },
-      }));
+      } as Availability));
     }
   }
 
