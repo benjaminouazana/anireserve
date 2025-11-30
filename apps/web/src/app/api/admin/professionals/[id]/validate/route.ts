@@ -4,7 +4,7 @@ import { getCurrentAdmin } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const admin = await getCurrentAdmin();
@@ -12,11 +12,12 @@ export async function PATCH(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
+    const { id } = await params;
     const { action, rejectionReason } = await request.json(); // action: "approve" | "reject"
 
     if (action === "approve") {
       const professional = await prisma.professional.update({
-        where: { id: parseInt(context.params.id) },
+        where: { id: parseInt(id) },
         data: {
           status: "approved",
           rejectionReason: null,
@@ -44,7 +45,7 @@ export async function PATCH(
       }
 
       const professional = await prisma.professional.update({
-        where: { id: parseInt(context.params.id) },
+        where: { id: parseInt(id) },
         data: {
           status: "rejected",
           rejectionReason: rejectionReason.trim(),
