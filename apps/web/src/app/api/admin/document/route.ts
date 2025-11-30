@@ -26,7 +26,7 @@ export async function GET(req: Request) {
             },
           });
         }
-      } catch (e) {
+      } catch {
         // Si ça échoue, rediriger
         return NextResponse.redirect(url);
       }
@@ -55,13 +55,14 @@ export async function GET(req: Request) {
           "Access-Control-Allow-Origin": "*",
         },
       });
-    } catch (fetchError: any) {
+    } catch (fetchError: unknown) {
       console.error("Erreur proxy document:", fetchError);
       // Si le proxy échoue, rediriger vers l'URL originale
       return NextResponse.redirect(url);
     }
-  } catch (error: any) {
-    console.error("Erreur route document:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur route document:", errorMessage);
     return NextResponse.json(
       { error: error.message || "Erreur lors de la récupération du document" },
       { status: 500 }

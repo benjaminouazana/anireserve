@@ -13,10 +13,11 @@ export async function POST(req: Request) {
       message: "Notification envoyée (simulée)",
       simulated: true,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/notifications/push:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/notifications/push:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'envoi de la notification" },
+      { error: errorMessage || "Erreur lors de l'envoi de la notification" },
       { status: 500 }
     );
   }

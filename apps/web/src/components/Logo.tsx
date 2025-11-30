@@ -10,7 +10,7 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-export function Logo({ className = "", width = 200, height = 80 }: { className?: string; width?: number; height?: number }) {
+export function Logo({ className = "", width = 300, height = 120, showTagline = false }: { className?: string; width?: number; height?: number; showTagline?: boolean }) {
   const [imageError, setImageError] = useState(false);
   const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
   
@@ -27,30 +27,37 @@ export function Logo({ className = "", width = 200, height = 80 }: { className?:
   // Fallback text logo si aucune image ne fonctionne - avec les couleurs de la charte
   if (imageError) {
     return (
-      <div className={`${montserrat.variable} font-montserrat flex items-center gap-2 ${className}`}>
-        <span 
-          className="text-2xl sm:text-3xl lg:text-4xl font-bold"
-          style={{ 
-            color: "transparent",
-            WebkitTextStroke: "2.5px #2FB190",
-            WebkitTextFillColor: "transparent",
-            letterSpacing: "0.05em"
-          }}
-        >
-          Ani
-        </span>
-        <span className="text-2xl sm:text-3xl lg:text-4xl font-black" style={{ color: "#18223b" }}>
-          RESERVE
-        </span>
+      <div className={`${montserrat.variable} font-montserrat ${className}`}>
+        <div className="flex items-center gap-2">
+          <span 
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold"
+            style={{ 
+              color: "transparent",
+              WebkitTextStroke: "2.5px #2FB190",
+              WebkitTextFillColor: "transparent",
+              letterSpacing: "0.05em"
+            }}
+          >
+            Ani
+          </span>
+          <span className="text-2xl sm:text-3xl lg:text-4xl font-black" style={{ color: "#18223b" }}>
+            RESERVE
+          </span>
+        </div>
+        {showTagline && (
+          <p className="mt-3 text-sm text-zinc-600 font-medium">
+            La plateforme de réservation en Israel<br />Pour les Français.
+          </p>
+        )}
       </div>
     );
   }
 
   return (
-    <div className={`${montserrat.variable} font-montserrat flex items-center ${className}`}>
+    <div className={`${montserrat.variable} font-montserrat ${className}`}>
       <Image
         src={logoSources[currentSrcIndex]}
-        alt="AniReserve Logo"
+        alt="AniReserve - La plateforme de réservation en Israel pour les Français"
         width={width}
         height={height}
         className="object-contain"

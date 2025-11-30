@@ -124,7 +124,7 @@ export default function Home() {
       );
       if (slotsResponse.ok) {
         const slotsData = await slotsResponse.json();
-        const slots = slotsData.availableSlots || [];
+        const slots = slotsData.slots || slotsData.availableSlots || [];
         setAvailableSlots(slots);
         if (slots.length === 0) {
           toast.showToast("Aucun créneau disponible pour cette date", "info");
@@ -156,6 +156,21 @@ export default function Home() {
   // Charger des pros par défaut au chargement et gérer proSlug dans l'URL
   useEffect(() => {
     loadDefaultProfessionals();
+    
+    // Charger les infos du client connecté pour préremplir le formulaire
+    async function loadClientInfo() {
+      try {
+        const clientRes = await fetch("/api/client/me", { credentials: "include" });
+        if (clientRes.ok) {
+          const client = await clientRes.json();
+          setClientName(client.name || "");
+          setClientEmail(client.email || "");
+        }
+      } catch (error) {
+        // Pas de client connecté, on laisse vide
+      }
+    }
+    loadClientInfo();
   }, []);
 
   // Gérer proSlug dans l'URL après le chargement des pros
@@ -288,10 +303,25 @@ export default function Home() {
       setBookingMessage(successMessage);
       toast.showToast(successMessage, "success");
       
-      // Réinitialiser le formulaire après 3 secondes
-      setTimeout(() => {
-        setClientName("");
-        setClientEmail("");
+      // Réinitialiser le formulaire après 3 secondes (mais garder nom/email si connecté)
+      setTimeout(async () => {
+        // Recharger les infos du client si connecté
+        try {
+          const clientRes = await fetch("/api/client/me", { credentials: "include" });
+          if (clientRes.ok) {
+            const client = await clientRes.json();
+            setClientName(client.name || "");
+            setClientEmail(client.email || "");
+          } else {
+            // Pas connecté, on vide tout
+            setClientName("");
+            setClientEmail("");
+          }
+        } catch (error) {
+          // Pas connecté, on vide tout
+          setClientName("");
+          setClientEmail("");
+        }
         setDate("");
         setStartTime("");
         setEndTime("");
@@ -364,10 +394,8 @@ export default function Home() {
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <header className="mb-6 sm:mb-8 flex items-center justify-between gap-3 sm:gap-4 flex-wrap">
           <div>
-            <Logo className="mb-2" />
-            <p className="mt-3 text-sm text-zinc-600 font-medium" role="doc-subtitle">
-              La plateforme de réservation en Israel<br />Pour les Français.
-            </p>
+            <Logo className="mb-2" width={350} height={140} />
+            <h1 className="sr-only">Trouvez votre professionnel en Israël - AniReserve</h1>
           </div>
           <div className="flex gap-2 flex-wrap">
             <ThemeToggle />
@@ -399,7 +427,7 @@ export default function Home() {
               <span className="hidden sm:inline">👤 </span>Connexion
             </Link>
             <Link
-              href="/pro/login"
+              href="/pro/dashboard"
               className="inline-flex items-center justify-center rounded-full px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white shadow-lg hover-lift hover:shadow-xl transition-all"
               style={{ background: "linear-gradient(135deg, #18223b 0%, #2FB190 100%)" }}
             >
@@ -779,34 +807,34 @@ export default function Home() {
                                 <span>Chargement des créneaux disponibles...</span>
                               </div>
                             ) : availableSlots.length > 0 ? (
-                              <select
-                                value={startTime && endTime ? `${startTime}-${endTime}` : ""}
-                                onChange={(e) => {
-                                  if (e.target.value) {
-                                    const [start, end] = e.target.value.split("-");
-                                    setStartTime(start);
-                                    setEndTime(end);
-                                  } else {
-                                    setStartTime("");
-                                    setEndTime("");
-                                  }
-                                }}
-                                required
-                                className="w-full rounded-lg sm:rounded-xl glass border-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm shadow-lg outline-none transition-all"
-                                style={{ borderColor: "#2FB190" }}
-                                onFocus={(e) => { e.currentTarget.style.borderColor = "#18223b"; e.currentTarget.style.boxShadow = "0 0 0 2px rgba(47, 177, 144, 0.2)"; }}
-                                onBlur={(e) => { e.currentTarget.style.borderColor = "#2FB190"; e.currentTarget.style.boxShadow = "none"; }}
-                              >
-                                <option value="">Sélectionne un créneau</option>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-2 rounded-lg bg-zinc-50 border-2 border-zinc-200">
                                 {availableSlots.map((slot) => {
                                   const [start, end] = slot.split("-");
+                                  const isSelected = startTime === start && endTime === end;
                                   return (
-                                    <option key={slot} value={slot}>
+                                    <button
+                                      key={slot}
+                                      type="button"
+                                      onClick={() => {
+                                        setStartTime(start);
+                                        setEndTime(end);
+                                      }}
+                                      className={`rounded-lg sm:rounded-xl px-3 py-2.5 text-xs sm:text-sm font-medium transition-all shadow-sm hover:shadow-md ${
+                                        isSelected
+                                          ? "text-white"
+                                          : "bg-white text-zinc-700 border-2 border-zinc-300 hover:border-zinc-400"
+                                      }`}
+                                      style={
+                                        isSelected
+                                          ? { background: "linear-gradient(135deg, #18223b 0%, #2FB190 100%)" }
+                                          : {}
+                                      }
+                                    >
                                       {start} - {end}
-                                    </option>
+                                    </button>
                                   );
                                 })}
-                              </select>
+                              </div>
                             ) : date ? (
                               <div className="text-xs text-zinc-600 bg-amber-50 border-2 border-amber-200 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2">
                                 ⚠️ Aucun créneau disponible pour cette date. Choisis une autre date ou contacte le professionnel.

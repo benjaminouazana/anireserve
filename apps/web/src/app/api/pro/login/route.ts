@@ -59,13 +59,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // Créer la session
+    // Créer la session persistante (30 jours)
     const cookieStore = await cookies();
     cookieStore.set("pro_session", professional.id.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
+      maxAge: 60 * 60 * 24 * 30, // 30 jours pour sessions persistantes
+      path: "/",
     });
 
     return NextResponse.json({

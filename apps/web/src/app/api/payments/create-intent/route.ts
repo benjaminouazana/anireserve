@@ -60,10 +60,11 @@ export async function POST(req: Request) {
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/payments/create-intent:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/payments/create-intent:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la création du paiement" },
+      { error: errorMessage || "Erreur lors de la création du paiement" },
       { status: 500 }
     );
   }

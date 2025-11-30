@@ -5,6 +5,7 @@ import { ReviewsSection } from "./ReviewsSection";
 import { ProfileHeader } from "./ProfileHeader";
 import { CalendarView } from "./CalendarView";
 import { Gallery } from "./Gallery";
+import { EditButtons } from "./EditButtons";
 import { generateMetadata } from "./metadata";
 import { generateSlug } from "@/lib/slug";
 
@@ -73,6 +74,15 @@ export default async function ProfessionalProfilePage({
           totalReviews={reviews.length}
           cities={cities}
         />
+
+        {/* Boutons d'édition pour le propriétaire */}
+        <div className="border-b border-zinc-200 bg-white px-4 py-4 sm:px-8">
+          <EditButtons
+            professionalId={professional.id}
+            currentGallery={gallery}
+            currentPricing={pricing}
+          />
+        </div>
 
         {/* Bio */}
         {professional.bio && (

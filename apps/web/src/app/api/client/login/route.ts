@@ -29,10 +29,11 @@ export async function POST(req: Request) {
         email: client.email,
       },
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/client/login:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/client/login:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la connexion" },
+      { error: errorMessage || "Erreur lors de la connexion" },
       { status: 500 }
     );
   }

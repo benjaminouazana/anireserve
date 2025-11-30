@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentClient, getCurrentProfessional } from "@/lib/auth";
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -40,10 +40,11 @@ export async function GET(
     });
 
     return NextResponse.json({ messages });
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings/[id]/messages:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings/[id]/messages:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération des messages" },
+      { error: errorMessage || "Erreur lors de la récupération des messages" },
       { status: 500 }
     );
   }
@@ -121,10 +122,11 @@ export async function POST(
     });
 
     return NextResponse.json(message, { status: 201 });
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings/[id]/messages:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings/[id]/messages:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'envoi du message" },
+      { error: errorMessage || "Erreur lors de l'envoi du message" },
       { status: 500 }
     );
   }

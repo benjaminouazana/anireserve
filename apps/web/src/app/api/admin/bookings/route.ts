@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: { status?: string } = {};
     if (status) {
       where.status = status;
     }
@@ -51,10 +51,10 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ bookings });
   } catch (error: unknown) {
-    console.error("Erreur récupération réservations:", error);
-    const err = error as Error;
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur récupération réservations:", errorMessage);
     return NextResponse.json(
-      { error: err.message || "Erreur lors de la récupération" },
+      { error: errorMessage || "Erreur lors de la récupération" },
       { status: 500 }
     );
   }

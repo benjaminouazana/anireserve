@@ -22,7 +22,8 @@ export async function loginProfessional(email: string, password: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: 60 * 60 * 24 * 30, // 30 jours pour sessions persistantes
+    path: "/",
   });
 
   return {
@@ -89,7 +90,8 @@ export async function loginClient(email: string, password: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: 60 * 60 * 24 * 30, // 30 jours pour sessions persistantes
+    path: "/",
   });
 
   return {
@@ -155,7 +157,8 @@ export async function loginAdmin(email: string, password: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 jours
+    maxAge: 60 * 60 * 24 * 30, // 30 jours pour sessions persistantes
+    path: "/",
   });
 
     return {

@@ -36,8 +36,9 @@ export async function PATCH(req: Request) {
       message: "Profil mis à jour avec succès",
       professional: updated,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/settings:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/settings:", errorMessage);
     return NextResponse.json(
       { error: error.message || "Erreur lors de la mise à jour du profil" },
       { status: 500 }

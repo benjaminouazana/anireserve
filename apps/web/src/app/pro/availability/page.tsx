@@ -4,10 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-type DaySchedule = {
-  enabled: boolean;
+type TimeSlot = {
   start: string;
   end: string;
+};
+
+type DaySchedule = {
+  enabled: boolean;
+  slots: TimeSlot[];
 };
 
 type Availability = {
@@ -24,13 +28,13 @@ type Availability = {
 };
 
 const defaultAvailability: Availability = {
-  monday: { enabled: true, start: "09:00", end: "18:00" },
-  tuesday: { enabled: true, start: "09:00", end: "18:00" },
-  wednesday: { enabled: true, start: "09:00", end: "18:00" },
-  thursday: { enabled: true, start: "09:00", end: "18:00" },
-  friday: { enabled: true, start: "09:00", end: "18:00" },
-  saturday: { enabled: false, start: "09:00", end: "18:00" },
-  sunday: { enabled: false, start: "09:00", end: "18:00" },
+  monday: { enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  tuesday: { enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  wednesday: { enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  thursday: { enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  friday: { enabled: true, slots: [{ start: "09:00", end: "18:00" }] },
+  saturday: { enabled: false, slots: [{ start: "09:00", end: "18:00" }] },
+  sunday: { enabled: false, slots: [{ start: "09:00", end: "18:00" }] },
   slotDuration: 30,
   breakStart: "12:00",
   breakEnd: "13:00",
@@ -51,7 +55,28 @@ export default function AvailabilityPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.availability) {
-            setAvailability({ ...defaultAvailability, ...JSON.parse(data.availability) });
+            const parsed = JSON.parse(data.availability);
+            // Convertir l'ancien format (start/end) au nouveau format (slots[])
+            const converted = { ...defaultAvailability };
+            Object.keys(converted).forEach((day) => {
+              if (day === "slotDuration" || day === "breakStart" || day === "breakEnd") return;
+              const dayData = parsed[day];
+              if (dayData) {
+                if (dayData.slots && Array.isArray(dayData.slots)) {
+                  converted[day as keyof Availability] = dayData as DaySchedule;
+                } else if (dayData.start && dayData.end) {
+                  // Ancien format : convertir en nouveau format
+                  converted[day as keyof Availability] = {
+                    enabled: dayData.enabled || false,
+                    slots: [{ start: dayData.start, end: dayData.end }],
+                  };
+                }
+              }
+            });
+            if (parsed.slotDuration) converted.slotDuration = parsed.slotDuration;
+            if (parsed.breakStart) converted.breakStart = parsed.breakStart;
+            if (parsed.breakEnd) converted.breakEnd = parsed.breakEnd;
+            setAvailability(converted);
           }
         }
       } catch (err) {
@@ -63,17 +88,55 @@ export default function AvailabilityPage() {
     loadAvailability();
   }, []);
 
-  function updateDay(day: keyof Availability, field: keyof DaySchedule, value: any) {
+  function updateDay(day: keyof Availability, field: keyof DaySchedule, value: boolean) {
+    if (field === "enabled") {
+      setAvailability((prev) => ({
+        ...prev,
+        [day]: {
+          ...prev[day],
+          enabled: value,
+        },
+      }));
+    }
+  }
+
+  function updateSlot(day: keyof Availability, slotIndex: number, field: "start" | "end", value: string) {
     setAvailability((prev) => {
       const daySchedule = prev[day];
-      if (!daySchedule || typeof daySchedule !== 'object') {
-        return prev;
-      }
+      const newSlots = [...daySchedule.slots];
+      newSlots[slotIndex] = { ...newSlots[slotIndex], [field]: value };
       return {
         ...prev,
         [day]: {
           ...daySchedule,
-          [field]: value,
+          slots: newSlots,
+        },
+      };
+    });
+  }
+
+  function addSlot(day: keyof Availability) {
+    setAvailability((prev) => {
+      const daySchedule = prev[day];
+      return {
+        ...prev,
+        [day]: {
+          ...daySchedule,
+          slots: [...daySchedule.slots, { start: "09:00", end: "10:00" }],
+        },
+      };
+    });
+  }
+
+  function removeSlot(day: keyof Availability, slotIndex: number) {
+    setAvailability((prev) => {
+      const daySchedule = prev[day];
+      const newSlots = daySchedule.slots.filter((_, i) => i !== slotIndex);
+      return {
+        ...prev,
+        [day]: {
+          ...daySchedule,
+          slots: newSlots.length > 0 ? newSlots : [{ start: "09:00", end: "10:00" }],
         },
       };
     });
@@ -209,7 +272,7 @@ export default function AvailabilityPage() {
                   key={day.key}
                   className="rounded-xl border border-zinc-200 bg-zinc-50 p-4"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <input
                         type="checkbox"
@@ -227,28 +290,48 @@ export default function AvailabilityPage() {
                         {day.label}
                       </label>
                     </div>
-                    {availability[day.key].enabled && (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="time"
-                          value={availability[day.key].start}
-                          onChange={(e) =>
-                            updateDay(day.key, "start", e.target.value)
-                          }
-                          className="rounded-lg border border-zinc-200 bg-white px-2 py-1 text-xs shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
-                        />
-                        <span className="text-xs text-zinc-500">-</span>
-                        <input
-                          type="time"
-                          value={availability[day.key].end}
-                          onChange={(e) =>
-                            updateDay(day.key, "end", e.target.value)
-                          }
-                          className="rounded-lg border border-zinc-200 bg-white px-2 py-1 text-xs shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
-                        />
-                      </div>
-                    )}
                   </div>
+                  {availability[day.key].enabled && (
+                    <div className="space-y-3 ml-7">
+                      {availability[day.key].slots.map((slot, slotIndex) => (
+                        <div key={slotIndex} className="flex items-center gap-2">
+                          <input
+                            type="time"
+                            value={slot.start}
+                            onChange={(e) =>
+                              updateSlot(day.key, slotIndex, "start", e.target.value)
+                            }
+                            className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                          />
+                          <span className="text-xs text-zinc-500">-</span>
+                          <input
+                            type="time"
+                            value={slot.end}
+                            onChange={(e) =>
+                              updateSlot(day.key, slotIndex, "end", e.target.value)
+                            }
+                            className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-xs shadow-sm outline-none ring-0 transition focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                          />
+                          {availability[day.key].slots.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeSlot(day.key, slotIndex)}
+                              className="rounded-lg border border-red-200 bg-red-50 px-2 py-1.5 text-xs text-red-700 transition hover:bg-red-100"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => addSlot(day.key)}
+                        className="text-xs text-zinc-600 hover:text-zinc-900 font-medium flex items-center gap-1"
+                      >
+                        + Ajouter une tranche horaire
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

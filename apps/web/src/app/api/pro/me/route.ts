@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentProfessional } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const professional = await getCurrentProfessional();
 
@@ -29,8 +29,9 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json(fullProfessional);
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/me:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/me:", errorMessage);
     return NextResponse.json(
       { error: error.message || "Erreur lors de la récupération du profil" },
       { status: 500 }

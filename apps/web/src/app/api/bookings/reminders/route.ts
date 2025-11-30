@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { sendBookingReminderEmail } from "@/lib/email";
 
 // Cette route peut être appelée par un cron job pour envoyer des rappels
-export async function POST(req: Request) {
+export async function POST() {
   try {
     // Récupérer les réservations confirmées pour demain
     const tomorrow = new Date();
@@ -58,10 +58,11 @@ export async function POST(req: Request) {
       message: `${results.length} rappels envoyés`,
       results,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings/reminders:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings/reminders:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'envoi des rappels" },
+      { error: errorMessage || "Erreur lors de l'envoi des rappels" },
       { status: 500 }
     );
   }

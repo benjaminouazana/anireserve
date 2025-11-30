@@ -73,8 +73,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       message: "Mot de passe modifié avec succès",
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/change-password:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/change-password:", errorMessage);
     return NextResponse.json(
       { error: error.message || "Erreur lors du changement de mot de passe" },
       { status: 500 }

@@ -48,8 +48,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       message: "Mot de passe réinitialisé avec succès. Tu peux maintenant te connecter.",
     });
-  } catch (error: any) {
-    console.error("Erreur reset password:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur reset password:", errorMessage);
     return NextResponse.json(
       { error: "Erreur lors de la réinitialisation du mot de passe" },
       { status: 500 }

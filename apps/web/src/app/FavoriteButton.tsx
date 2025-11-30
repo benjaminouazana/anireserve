@@ -12,9 +12,9 @@ export function FavoriteButton({ professionalId }: { professionalId: number }) {
         const response = await fetch("/api/favorites");
         if (response.ok) {
           const favorites = await response.json();
-          setIsFavorite(favorites.some((f: any) => f.professionalId === professionalId));
+          setIsFavorite(favorites.some((f: { professionalId: number }) => f.professionalId === professionalId));
         }
-      } catch (error) {
+      } catch {
         // Pas connecté, ignorer
       }
     }

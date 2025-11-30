@@ -124,10 +124,11 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la création de la réservation" },
+      { error: errorMessage || "Erreur lors de la création de la réservation" },
       { status: 500 }
     );
   }
@@ -184,10 +185,11 @@ export async function GET(req: Request) {
     }));
 
     return NextResponse.json(bookings);
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération des réservations" },
+      { error: errorMessage || "Erreur lors de la récupération des réservations" },
       { status: 500 }
     );
   }

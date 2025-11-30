@@ -37,9 +37,9 @@ model Professional {
   status               String     @default("pending")
   teoudatZeout         String?
   passwordResetToken   String?
-  passwordResetExpires DateTime?
-  pricing              String? // JSON string pour stocker les prix par service
-  slug                 String? @unique // Slug pour l'URL (ex: "Avi-Rosen")
+  passwordResetExpires DateTime?  @db.Timestamp(6)
+  pricing              String?
+  slug                 String?    @unique
   bookings             Booking[]
   favorites            Favorite[]
   reviews              Review[]
@@ -51,7 +51,7 @@ model Client {
   email                String     @unique
   password             String?
   passwordResetToken   String?
-  passwordResetExpires DateTime?
+  passwordResetExpires DateTime?  @db.Timestamp(6)
   bookings             Booking[]
   favorites            Favorite[]
   reviews              Review[]

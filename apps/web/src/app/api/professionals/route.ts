@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     const skip = (page - 1) * limit;
 
     // Construire les conditions de recherche
-    const whereConditions: any = {
+    const whereConditions: Record<string, unknown> = {
       status: "approved", // Seulement les profils approuvés
     };
 
@@ -207,8 +207,9 @@ export async function GET(req: Request) {
     // Cache pour 30 secondes (les données changent peu souvent)
     response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
     return response;
-  } catch (error: any) {
-    console.error("Erreur API /api/professionals:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/professionals:", errorMessage);
     // Retourner toujours un format valide même en cas d'erreur
     return NextResponse.json(
       { 

@@ -107,7 +107,7 @@ export default function AdminLoginPage() {
               href="/"
               className="text-sm text-zinc-500 hover:text-zinc-700 transition font-medium"
             >
-              ← Retour à l'accueil
+              ← Retour à l&apos;accueil
             </Link>
           </div>
         </div>

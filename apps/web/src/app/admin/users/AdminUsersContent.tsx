@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface Admin {
@@ -25,19 +24,15 @@ interface Professional {
   verified: boolean;
 }
 
-export function AdminUsersContent({ admin }: { admin: Admin }) {
-  const router = useRouter();
+export function AdminUsersContent({}: { admin: Admin }) {
+  // const router = useRouter();
   const [activeTab, setActiveTab] = useState<"clients" | "professionals" | "all">("all");
   const [clients, setClients] = useState<Client[]>([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    loadUsers();
-  }, [activeTab]);
-
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/admin/users?type=${activeTab}`, {
@@ -56,7 +51,11 @@ export function AdminUsersContent({ admin }: { admin: Admin }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [activeTab]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   async function handleVerify(professionalId: number, verified: boolean) {
     try {

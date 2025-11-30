@@ -37,16 +37,30 @@ export async function POST(req: Request) {
       );
     }
 
-    // Vérifier si le pro existe déjà
-    const existing = await prisma.professional.findUnique({
+    // Vérifier si le pro existe déjà avec cet email
+    const existingByEmail = await prisma.professional.findUnique({
       where: { email },
     });
 
-    if (existing) {
+    if (existingByEmail) {
       return NextResponse.json(
-        { error: "Un professionnel avec cet email existe déjà" },
+        { error: "Un compte avec cet email existe déjà. Si vous avez déjà un compte, connectez-vous." },
         { status: 400 }
       );
+    }
+
+    // Vérifier si le téléphone existe déjà (si fourni)
+    if (phone) {
+      const existingByPhone = await prisma.professional.findFirst({
+        where: { phone },
+      });
+
+      if (existingByPhone) {
+        return NextResponse.json(
+          { error: "Un compte avec ce numéro de téléphone existe déjà. Si vous avez déjà un compte, connectez-vous." },
+          { status: 400 }
+        );
+      }
     }
 
     // Hasher le mot de passe
@@ -102,8 +116,9 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Erreur inscription pro:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur inscription pro:", errorMessage);
     return NextResponse.json(
       { error: error.message || "Erreur lors de la création du compte" },
       { status: 500 }

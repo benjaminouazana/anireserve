@@ -30,7 +30,7 @@ interface Review {
   };
 }
 
-export function AdminReviewsContent({ admin }: { admin: Admin }) {
+export function AdminReviewsContent({}: { admin: Admin }) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -141,7 +141,7 @@ export function AdminReviewsContent({ admin }: { admin: Admin }) {
                       </div>
                       {review.comment && (
                         <div className="text-sm text-zinc-700 mt-2 p-3 bg-zinc-50 rounded-lg">
-                          "{review.comment}"
+                          &quot;{review.comment}&quot;
                         </div>
                       )}
                       <div className="text-xs text-zinc-500 mt-2">

@@ -15,8 +15,9 @@ export async function POST(req: Request) {
     let formData: FormData;
     try {
       formData = await req.formData();
-    } catch (formError: any) {
-      console.error("Erreur parsing FormData:", formError);
+    } catch (formError: unknown) {
+      const errorMessage = formError instanceof Error ? formError.message : "Erreur inconnue";
+      console.error("Erreur parsing FormData:", errorMessage);
       return NextResponse.json(
         { error: "Erreur lors de la lecture du formulaire. Assurez-vous d'envoyer un fichier valide." },
         { status: 400, headers: jsonHeaders }
@@ -61,20 +62,54 @@ export async function POST(req: Request) {
       );
     }
 
-    // Toujours utiliser le mode simulé pour l'instant (Supabase optionnel)
-    // Si Supabase n'est pas configuré, retourner une URL simulée (mode développement)
+    // Vérifier si Supabase est configuré
     const hasSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
+    // Si Supabase n'est pas configuré, stocker localement
     if (!hasSupabase || process.env.NODE_ENV === "development") {
-      console.log("📤 Upload simulé - Fichier:", file.name, "Taille:", file.size);
-      // En mode développement, on accepte l'upload même sans Supabase
-      // On génère une URL unique pour le fichier
-      const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-      return NextResponse.json({
-        url: `https://via.placeholder.com/400?text=${encodeURIComponent(file.name)}&id=${uniqueId}`,
-        simulated: true,
-        message: "Upload simulé - Le fichier sera stocké après configuration de Supabase",
-      }, { headers: jsonHeaders });
+      console.log("📤 Upload local - Fichier:", file.name, "Taille:", file.size);
+      
+      try {
+        // Importer fs et path pour le stockage local
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        
+        // Créer le dossier d'upload s'il n'existe pas
+        const uploadDir = path.join(process.cwd(), "public", "uploads", folder);
+        await fs.mkdir(uploadDir, { recursive: true });
+        
+        // Générer un nom de fichier unique
+        const timestamp = Date.now();
+        const randomId = Math.random().toString(36).substring(2, 15);
+        const fileExt = file.name.split(".").pop()?.toLowerCase() || "bin";
+        const fileName = `${timestamp}-${randomId}.${fileExt}`;
+        const filePath = path.join(uploadDir, fileName);
+        
+        // Convertir le File en Buffer et sauvegarder
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        await fs.writeFile(filePath, buffer);
+        
+        // Retourner l'URL publique
+        const publicUrl = `/uploads/${folder}/${fileName}`;
+        
+        console.log("✅ Fichier sauvegardé:", publicUrl);
+        return NextResponse.json({
+          url: publicUrl,
+          local: true,
+          message: "Fichier uploadé avec succès (stockage local)",
+        }, { headers: jsonHeaders });
+      } catch (localError: unknown) {
+        const errorMessage = localError instanceof Error ? localError.message : "Erreur inconnue";
+        console.error("Erreur upload local:", errorMessage);
+        // En cas d'erreur, retourner une URL simulée comme fallback
+        const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        return NextResponse.json({
+          url: `/api/upload/placeholder?name=${encodeURIComponent(file.name)}&id=${uniqueId}`,
+          simulated: true,
+          warning: "Upload local échoué, utilisation du mode simulé",
+        }, { headers: jsonHeaders });
+      }
     }
 
     // Upload vers Supabase Storage (seulement si configuré et en production)
@@ -86,7 +121,7 @@ export async function POST(req: Request) {
       const fileName = `${timestamp}-${randomId}.${fileExt}`;
       const filePath = `${folder}/${fileName}`;
 
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from("images")
         .upload(filePath, file, {
           cacheControl: "3600",
@@ -94,7 +129,7 @@ export async function POST(req: Request) {
         });
 
       if (error) {
-        console.error("Erreur Supabase upload:", error);
+        console.error("Erreur Supabase upload:", error.message || String(error));
         throw error;
       }
 
@@ -103,8 +138,9 @@ export async function POST(req: Request) {
       } = supabase.storage.from("images").getPublicUrl(filePath);
 
       return NextResponse.json({ url: publicUrl }, { headers: jsonHeaders });
-    } catch (uploadError: any) {
-      console.error("Erreur upload Supabase:", uploadError);
+    } catch (uploadError: unknown) {
+      const errorMessage = uploadError instanceof Error ? uploadError.message : "Erreur inconnue";
+      console.error("Erreur upload Supabase:", errorMessage);
       // En cas d'erreur Supabase, retourner une URL simulée
       const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
       return NextResponse.json({
@@ -113,13 +149,14 @@ export async function POST(req: Request) {
         warning: "Upload simulé - Supabase non disponible",
       }, { headers: jsonHeaders });
     }
-  } catch (error: any) {
-    console.error("Erreur upload:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur upload:", errorMessage);
     // Toujours retourner du JSON, jamais de HTML
     return NextResponse.json(
       { 
-        error: error.message || "Erreur lors de l'upload du fichier. Veuillez réessayer.",
-        details: process.env.NODE_ENV === "development" ? error.stack : undefined
+        error: errorMessage || "Erreur lors de l'upload du fichier. Veuillez réessayer.",
+        details: process.env.NODE_ENV === "development" && error instanceof Error ? error.stack : undefined
       },
       { 
         status: 500,

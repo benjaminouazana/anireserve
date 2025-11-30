@@ -48,10 +48,11 @@ export async function GET(req: Request) {
 
     // Format JSON par défaut
     return NextResponse.json(bookings);
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/export:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/export:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'export" },
+      { error: errorMessage || "Erreur lors de l'export" },
       { status: 500 }
     );
   }

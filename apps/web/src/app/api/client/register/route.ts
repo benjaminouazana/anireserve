@@ -55,10 +55,11 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Erreur API /api/client/register:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/client/register:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la création du compte" },
+      { error: errorMessage || "Erreur lors de la création du compte" },
       { status: 500 }
     );
   }

@@ -52,8 +52,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       message: "Si cet email existe, un lien de réinitialisation a été envoyé.",
     });
-  } catch (error: any) {
-    console.error("Erreur forgot password:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur forgot password:", errorMessage);
     return NextResponse.json(
       { error: "Erreur lors de la demande de réinitialisation" },
       { status: 500 }

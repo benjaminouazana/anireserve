@@ -29,10 +29,10 @@ interface ProfessionalByService {
   count: number;
 }
 
-interface ProfessionalByCity {
-  city: string;
-  count: number;
-}
+// interface ProfessionalByCity {
+//   city: string;
+//   count: number;
+// }
 
 export function AdminDashboardContent({ admin }: { admin: Admin }) {
   const router = useRouter();
@@ -40,9 +40,9 @@ export function AdminDashboardContent({ admin }: { admin: Admin }) {
   const [professionalsByService, setProfessionalsByService] = useState<
     ProfessionalByService[]
   >([]);
-  const [professionalsByCity] = useState<
-    ProfessionalByCity[]
-  >([]);
+  // const [professionalsByCity] = useState<
+  //   ProfessionalByCity[]
+  // >([]);
   const [recentBookings, setRecentBookings] = useState<Array<{
     id: number;
     professional: { name: string; serviceType: string };

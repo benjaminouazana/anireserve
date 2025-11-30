@@ -85,8 +85,9 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
       loadProfessionals();
       setSelectedPro(null);
       setRejectionReason("");
-    } catch (error: any) {
-      alert(`Erreur: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+      alert(`Erreur: ${errorMessage}`);
     } finally {
       setProcessing(null);
     }
@@ -204,7 +205,7 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
                         </div>
                       )}
                       <div>
-                        <span className="font-medium text-zinc-700">Date d'inscription:</span>{" "}
+                        <span className="font-medium text-zinc-700">Date d&apos;inscription:</span>{" "}
                         <span className="text-zinc-600">
                           {new Date(pro.createdAt).toLocaleDateString("fr-FR")}
                         </span>
@@ -311,10 +312,10 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
               {documentError ? (
                 <div className="text-center p-8">
                   <p className="text-zinc-600 font-semibold mb-4">
-                    Impossible d'afficher le document directement
+                    Impossible d&apos;afficher le document directement
                   </p>
                   <p className="text-sm text-zinc-500 mb-4">
-                    Le document peut être une image ou un PDF. Cliquez sur le lien ci-dessous pour l'ouvrir.
+                    Le document peut être une image ou un PDF. Cliquez sur le lien ci-dessous pour l&apos;ouvrir.
                   </p>
                   <a
                     href={viewingDocument || '#'}
@@ -327,7 +328,17 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
                 </div>
               ) : (() => {
                 // Détecter si c'est une URL placeholder (mode développement)
-                const isPlaceholder = viewingDocument.includes('via.placeholder.com') || viewingDocument.includes('placeholder.com');
+                const isPlaceholder = viewingDocument.includes('via.placeholder.com') || 
+                                      viewingDocument.includes('placeholder.com') ||
+                                      viewingDocument.startsWith('/api/upload/placeholder');
+                
+                // Détecter si c'est une URL locale (commence par /uploads/)
+                const isLocal = viewingDocument.startsWith('/uploads/');
+                
+                // Extraire l'extension du fichier
+                const urlWithoutParams = viewingDocument.split('?')[0];
+                const extension = urlWithoutParams.split('.').pop()?.toLowerCase() || '';
+                const isPdf = extension === 'pdf';
                 
                 if (isPlaceholder) {
                   return (
@@ -338,7 +349,7 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
                           Document de test (mode développement)
                         </p>
                         <p className="text-sm text-zinc-500 mb-4">
-                          En production, le document Teoudate Zeoute sera stocké sur Supabase et affiché ici.
+                          Ce document utilise un placeholder. Les nouveaux uploads seront stockés localement.
                         </p>
                         <p className="text-xs text-zinc-400 mb-4">
                           URL: {viewingDocument.substring(0, 80)}...
@@ -350,26 +361,21 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
                         rel="noopener noreferrer"
                         className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
                       >
-                        📄 Essayer d'ouvrir l'URL
+                        📄 Essayer d&apos;ouvrir l&apos;URL
                       </a>
                     </div>
                   );
                 }
                 
-                // Extraire l'extension du fichier même avec des paramètres de requête
-                const urlWithoutParams = viewingDocument.split('?')[0];
-                const extension = urlWithoutParams.split('.').pop()?.toLowerCase() || '';
-                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'bmp', 'svg'].includes(extension);
-                const isPdf = extension === 'pdf';
-                
-                // Utiliser l'URL proxy pour éviter les problèmes CORS (sauf pour les placeholders)
-                const proxyUrl = `/api/admin/document?url=${encodeURIComponent(viewingDocument)}`;
+                // Pour les fichiers locaux, utiliser directement l'URL
+                // Pour les fichiers externes, utiliser le proxy
+                const displayUrl = isLocal ? viewingDocument : `/api/admin/document?url=${encodeURIComponent(viewingDocument)}`;
                 
                 // Si c'est un PDF, afficher dans un iframe
                 if (isPdf) {
                   return (
                     <iframe
-                      src={proxyUrl}
+                      src={displayUrl}
                       className="w-full h-[calc(90vh-120px)] rounded-lg shadow-lg"
                       title="Teoudate Zeoute PDF"
                       onError={() => setDocumentError(true)}
@@ -377,11 +383,11 @@ export function AdminPendingProfessionalsContent({ admin }: { admin: Admin }) {
                   );
                 }
                 
-                // Pour les images ou formats inconnus, essayer d'abord comme image
-                // Utiliser l'URL proxy pour éviter les problèmes CORS
+                // Pour les images, afficher directement
+                // eslint-disable-next-line @next/next/no-img-element
                 return (
                   <img
-                    src={proxyUrl}
+                    src={displayUrl}
                     alt="Teoudate Zeoute"
                     className="max-w-full max-h-[calc(90vh-200px)] object-contain rounded-lg shadow-lg mx-auto"
                     onError={() => setDocumentError(true)}

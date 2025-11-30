@@ -48,10 +48,17 @@ export default function MyBookingsPage() {
         setClient(clientData);
 
         // Charger les réservations
-        const bookingsRes = await fetch(`/api/bookings?email=${encodeURIComponent(clientData.email)}`);
+        const bookingsRes = await fetch(`/api/bookings?email=${encodeURIComponent(clientData.email)}`, {
+          credentials: "include",
+        });
         if (bookingsRes.ok) {
           const bookingsData = await bookingsRes.json();
-          setBookings(bookingsData);
+          // L'API peut retourner un tableau directement ou un objet avec bookings
+          const bookingsArray = Array.isArray(bookingsData) ? bookingsData : (bookingsData.bookings || []);
+          setBookings(bookingsArray);
+        } else {
+          console.error("Erreur chargement réservations:", bookingsRes.status);
+          setBookings([]);
         }
       } catch (err: any) {
         setError(err.message || "Erreur lors du chargement");
@@ -199,6 +206,14 @@ export default function MyBookingsPage() {
                         >
                           Voir le profil →
                         </Link>
+                        {booking.status !== "cancelled" && (
+                          <Link
+                            href={`/bookings/${booking.id}/chat`}
+                            className="text-xs text-primary hover:text-primary-dark transition font-medium flex items-center gap-1"
+                          >
+                            💬 Chat
+                          </Link>
+                        )}
                         {booking.status === "confirmed" && (
                           <>
                             <Link

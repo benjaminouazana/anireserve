@@ -10,10 +10,11 @@ export async function GET() {
     }
 
     return NextResponse.json(client);
-  } catch (error: any) {
-    console.error("Erreur API /api/client/me:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/client/me:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération du profil" },
+      { error: errorMessage || "Erreur lors de la récupération du profil" },
       { status: 500 }
     );
   }

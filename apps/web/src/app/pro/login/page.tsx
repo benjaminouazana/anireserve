@@ -95,6 +95,21 @@ export default function ProLoginPage() {
               />
             </div>
 
+            <div className="flex items-center">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                defaultChecked={true}
+                className="h-4 w-4 rounded border-zinc-300 text-primary focus:ring-2 focus:ring-primary"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="ml-2 block text-sm text-zinc-600"
+              >
+                Se souvenir de moi
+              </label>
+            </div>
+
             {success && (
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                 ✅ Compte créé avec succès ! Connecte-toi maintenant.

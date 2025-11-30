@@ -28,10 +28,11 @@ export async function PATCH(req: Request) {
       message: "Abonnement mis à jour",
       plan,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/subscription:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/subscription:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la mise à jour" },
+      { error: errorMessage || "Erreur lors de la mise à jour" },
       { status: 500 }
     );
   }

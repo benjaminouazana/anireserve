@@ -62,10 +62,11 @@ export async function POST(req: Request) {
       discount,
       finalAmount,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/promo-codes:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/promo-codes:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'application du code" },
+      { error: errorMessage || "Erreur lors de l'application du code" },
       { status: 500 }
     );
   }

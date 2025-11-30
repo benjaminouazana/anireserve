@@ -102,10 +102,11 @@ export async function POST(
       message: "Réservation annulée avec succès",
       booking: updated,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings/[id]/cancel:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings/[id]/cancel:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'annulation" },
+      { error: errorMessage || "Erreur lors de l'annulation" },
       { status: 500 }
     );
   }

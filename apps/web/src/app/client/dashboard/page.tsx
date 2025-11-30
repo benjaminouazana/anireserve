@@ -204,12 +204,20 @@ export default function ClientDashboardPage() {
                           {formatDate(booking.startTime)} à {formatTime(booking.startTime)}
                         </p>
                       </div>
-                      <Link
-                        href={`/professionals/${getProfessionalSlug(booking.professional)}`}
-                        className="text-xs text-zinc-500 hover:text-zinc-700 transition"
-                      >
-                        Voir →
-                      </Link>
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/bookings/${booking.id}/chat`}
+                          className="text-xs text-primary hover:text-primary-dark transition font-medium"
+                        >
+                          💬 Chat
+                        </Link>
+                        <Link
+                          href={`/professionals/${getProfessionalSlug(booking.professional)}`}
+                          className="text-xs text-zinc-500 hover:text-zinc-700 transition"
+                        >
+                          Voir →
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}

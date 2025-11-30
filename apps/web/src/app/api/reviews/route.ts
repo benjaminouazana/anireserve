@@ -72,10 +72,11 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Erreur API /api/reviews:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/reviews:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la création de l'avis" },
+      { error: errorMessage || "Erreur lors de la création de l'avis" },
       { status: 500 }
     );
   }
@@ -119,10 +120,11 @@ export async function GET(req: Request) {
       averageRating: Math.round(averageRating * 10) / 10,
       totalReviews: reviews.length,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/reviews:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/reviews:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération des avis" },
+      { error: errorMessage || "Erreur lors de la récupération des avis" },
       { status: 500 }
     );
   }

@@ -57,10 +57,11 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Erreur API /api/admin/create:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/admin/create:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la création du compte admin" },
+      { error: errorMessage || "Erreur lors de la création du compte admin" },
       { status: 500 }
     );
   }

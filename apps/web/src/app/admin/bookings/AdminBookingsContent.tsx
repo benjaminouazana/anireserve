@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface Admin {
@@ -28,16 +28,12 @@ interface Booking {
   };
 }
 
-export function AdminBookingsContent({ admin }: { admin: Admin }) {
+export function AdminBookingsContent({}: { admin: Admin }) {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  useEffect(() => {
-    loadBookings();
-  }, [statusFilter]);
-
-  async function loadBookings() {
+  const loadBookings = useCallback(async () => {
     setLoading(true);
     try {
       const url = statusFilter === "all" 
@@ -58,7 +54,11 @@ export function AdminBookingsContent({ admin }: { admin: Admin }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [statusFilter]);
+
+  useEffect(() => {
+    loadBookings();
+  }, [loadBookings]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans text-zinc-900">

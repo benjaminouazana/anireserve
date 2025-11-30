@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     );
 
     if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object as any;
-      const bookingId = parseInt(paymentIntent.metadata.bookingId);
+      const paymentIntent = event.data.object as { metadata?: { bookingId?: string } };
+      const bookingId = parseInt(paymentIntent.metadata?.bookingId || "0");
 
       await prisma.booking.update({
         where: { id: bookingId },
@@ -32,10 +32,11 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
-    console.error("Erreur webhook Stripe:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur webhook Stripe:", errorMessage);
     return NextResponse.json(
-      { error: error.message },
+      { error: errorMessage },
       { status: 400 }
     );
   }

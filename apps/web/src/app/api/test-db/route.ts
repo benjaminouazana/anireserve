@@ -15,13 +15,15 @@ export async function GET() {
       message: "Connexion à la base de données réussie",
       professionalCount: count,
     });
-  } catch (error: any) {
-    console.error("Erreur de connexion DB:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    const errorDetails = error instanceof Error ? error.toString() : String(error);
+    console.error("Erreur de connexion DB:", errorMessage);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Erreur de connexion à la base de données",
-        details: error.toString(),
+        error: errorMessage || "Erreur de connexion à la base de données",
+        details: errorDetails,
       },
       { status: 500 }
     );

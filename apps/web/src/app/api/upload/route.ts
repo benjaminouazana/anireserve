@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const fileName = `${professional.id}-${Date.now()}.${fileExt}`;
     const filePath = `professionals/${professional.id}/${fileName}`;
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from("images")
       .upload(filePath, file, {
         cacheControl: "3600",
@@ -49,10 +49,11 @@ export async function POST(req: Request) {
     } = supabase.storage.from("images").getPublicUrl(filePath);
 
     return NextResponse.json({ url: publicUrl });
-  } catch (error: any) {
-    console.error("Erreur upload:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur upload:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'upload" },
+      { error: errorMessage || "Erreur lors de l'upload" },
       { status: 500 }
     );
   }

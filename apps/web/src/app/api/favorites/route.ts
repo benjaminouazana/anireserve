@@ -71,10 +71,11 @@ export async function GET() {
     });
 
     return NextResponse.json({ favorites: favoritesWithRatings });
-  } catch (error: any) {
-    console.error("Erreur API /api/favorites:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/favorites:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération des favoris" },
+      { error: errorMessage || "Erreur lors de la récupération des favoris" },
       { status: 500 }
     );
   }
@@ -132,10 +133,11 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(favorite, { status: 201 });
-  } catch (error: any) {
-    console.error("Erreur API /api/favorites:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/favorites:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de l'ajout aux favoris" },
+      { error: errorMessage || "Erreur lors de l'ajout aux favoris" },
       { status: 500 }
     );
   }
@@ -179,10 +181,11 @@ export async function DELETE(req: Request) {
     });
 
     return NextResponse.json({ message: "Retiré des favoris" });
-  } catch (error: any) {
-    console.error("Erreur API /api/favorites:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/favorites:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la suppression" },
+      { error: errorMessage || "Erreur lors de la suppression" },
       { status: 500 }
     );
   }

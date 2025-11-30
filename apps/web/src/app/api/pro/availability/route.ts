@@ -24,10 +24,11 @@ export async function GET() {
       breakStart: fullProfessional?.breakStart,
       breakEnd: fullProfessional?.breakEnd,
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/availability:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/availability:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération" },
+      { error: errorMessage || "Erreur lors de la récupération" },
       { status: 500 }
     );
   }
@@ -55,10 +56,11 @@ export async function PATCH(req: Request) {
     return NextResponse.json({
       message: "Disponibilités mises à jour avec succès",
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/pro/availability:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/pro/availability:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la mise à jour" },
+      { error: errorMessage || "Erreur lors de la mise à jour" },
       { status: 500 }
     );
   }

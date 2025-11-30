@@ -13,10 +13,10 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: {
-    default: "AniReserve - La plateforme de réservation en Israël pour les Français",
+    default: "AniReserve - Réservation professionnels en Israël",
     template: "%s | AniReserve",
   },
-  description: "Trouvez et réservez facilement des professionnels en Israël. Coiffeurs, esthéticiennes, médecins et bien plus. Plateforme de réservation simple et sécurisée pour la communauté française en Israël.",
+  description: "Trouvez et réservez des professionnels en Israël. Coiffeurs, esthéticiennes, médecins. Plateforme simple pour les Français.",
   keywords: ["réservation", "professionnels", "Israël", "français", "coiffeur", "esthétique", "médecin", "rendez-vous", "booking"],
   authors: [{ name: "AniReserve" }],
   creator: "AniReserve",
@@ -53,6 +53,17 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logo.png", type: "image/png", sizes: "32x32" },
+      { url: "/logo.png", type: "image/png", sizes: "192x192" },
+      { url: "/logo.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [
+      { url: "/logo.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 

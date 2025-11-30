@@ -40,16 +40,16 @@ export async function POST(req: Request) {
           email: admin.email,
         },
       });
-    } catch (dbError: any) {
+    } catch (dbError: unknown) {
       console.error("Erreur base de données login admin:", dbError);
       return NextResponse.json(
         { error: "Erreur lors de la vérification des identifiants" },
         { status: 500 }
       );
     }
-  } catch (error: any) {
-    console.error("Erreur login admin:", error);
-    const err = error as Error;
+  } catch (error: unknown) {
+    const err = error instanceof Error ? error : new Error("Erreur inconnue");
+    console.error("Erreur login admin:", err);
     return NextResponse.json(
       { error: err.message || "Erreur lors de la connexion" },
       { status: 500 }

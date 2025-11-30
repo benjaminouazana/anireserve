@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentProfessional } from "@/lib/auth";
 
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -28,10 +28,11 @@ export async function GET(
       startTime: booking.startTime.toISOString(),
       endTime: booking.endTime.toISOString(),
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings/[id]:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings/[id]:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la récupération" },
+      { error: errorMessage || "Erreur lors de la récupération" },
       { status: 500 }
     );
   }
@@ -159,10 +160,11 @@ export async function PATCH(
         endTime: updatedBooking.endTime.toISOString(),
       },
     });
-  } catch (error: any) {
-    console.error("Erreur API /api/bookings/[id] PATCH:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
+    console.error("Erreur API /api/bookings/[id] PATCH:", errorMessage);
     return NextResponse.json(
-      { error: error.message || "Erreur lors de la mise à jour" },
+      { error: errorMessage || "Erreur lors de la mise à jour" },
       { status: 500 }
     );
   }

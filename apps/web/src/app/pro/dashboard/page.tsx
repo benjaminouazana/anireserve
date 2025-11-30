@@ -11,19 +11,17 @@ function getProfessionalSlug(pro: any): string {
   return generateSlug(pro.name);
 }
 
-// Lazy loading des composants lourds
+// Lazy loading des composants lourds (sans ssr: false car c'est un Server Component)
 const BookingActions = dynamic(() => import("./BookingActions").then(mod => ({ default: mod.BookingActions })), {
   loading: () => <div className="text-center py-4 text-zinc-500">Chargement...</div>,
-  ssr: false,
 });
 
 const LogoutButton = dynamic(() => import("./LogoutButton").then(mod => ({ default: mod.LogoutButton })), {
-  ssr: false,
+  loading: () => <div className="text-center py-2 text-zinc-500">Chargement...</div>,
 });
 
 const CalendarView = dynamic(() => import("./CalendarView").then(mod => ({ default: mod.CalendarView })), {
   loading: () => <div className="text-center py-8 text-zinc-500">Chargement du calendrier...</div>,
-  ssr: false,
 });
 
 export default async function ProDashboardPage() {
@@ -99,6 +97,12 @@ export default async function ProDashboardPage() {
               className="inline-flex items-center rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50"
             >
               ⚙️ Paramètres
+            </Link>
+            <Link
+              href="/pro/create-booking"
+              className="inline-flex items-center rounded-full border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800 shadow-sm transition hover:border-emerald-400 hover:bg-emerald-100"
+            >
+              ➕ Créer une réservation
             </Link>
             <Link
               href="/"
