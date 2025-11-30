@@ -2,17 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAdmin } from "@/lib/auth";
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(request: Request, context: any) {
   try {
     const admin = await getCurrentAdmin();
     if (!admin) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { id } = await params;
+    const { id } = await context.params;
     const reviewId = parseInt(id);
 
     await prisma.review.delete({
