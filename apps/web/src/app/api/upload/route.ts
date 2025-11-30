@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     }
 
     // Si Supabase n'est pas configuré, retourner une URL simulée
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    if (!supabase) {
       return NextResponse.json({
         url: `https://via.placeholder.com/400?text=${encodeURIComponent(file.name)}`,
         simulated: true,
