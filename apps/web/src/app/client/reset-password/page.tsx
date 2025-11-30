@@ -163,6 +163,14 @@ function ClientResetPasswordContent() {
   );
 }
 
+export default function ClientResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <ClientResetPasswordContent />
+    </Suspense>
+  );
+}
+
 
 
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FavoriteButton } from "./FavoriteButton";
@@ -38,7 +38,7 @@ const FALLBACK_PROS = [
 
 type Professional = (typeof FALLBACK_PROS)[number];
 
-export default function Home() {
+function HomeContent() {
   const toast = useToast();
   const searchParams = useSearchParams();
   const [city, setCity] = useState("");
@@ -959,5 +959,13 @@ export default function Home() {
       </main>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }
