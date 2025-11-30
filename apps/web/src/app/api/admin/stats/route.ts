@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAdmin } from "@/lib/auth";
 
+interface ProfessionalByService {
+  serviceType: string;
+  _count: { id: number };
+}
+
+interface ProfessionalByCity {
+  city: string;
+  _count: { id: number };
+}
+
 export async function GET() {
   try {
     // Vérifier que l'utilisateur est admin
@@ -99,11 +109,11 @@ export async function GET() {
         bookingsByStatus,
         bookingsLast30Days,
       },
-      professionalsByService: professionalsByService.map((p: { serviceType: string; _count: { id: number } }) => ({
+      professionalsByService: professionalsByService.map((p: ProfessionalByService) => ({
         service: p.serviceType,
         count: p._count.id,
       })),
-      professionalsByCity: professionalsByCity.map((p: { city: string; _count: { id: number } }) => ({
+      professionalsByCity: professionalsByCity.map((p: ProfessionalByCity) => ({
         city: p.city,
         count: p._count.id,
       })),
