@@ -3,6 +3,5 @@
   "outputDirectory": "apps/web/.next",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["cdg1"]
+  "rootDirectory": "apps/web"
 }
-
