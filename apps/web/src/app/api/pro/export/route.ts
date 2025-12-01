@@ -26,7 +26,15 @@ export async function GET(req: Request) {
     if (format === "csv") {
       // Générer CSV
       const csvHeader = "Date,Heure,Client,Email,Statut,Montant\n";
-      const csvRows = bookings.map((b) => {
+      const csvRows = bookings.map((b: {
+        startTime: Date;
+        status: string;
+        amount: number | null;
+        client: {
+          name: string;
+          email: string;
+        };
+      }) => {
         const date = new Date(b.startTime);
         const dateStr = date.toLocaleDateString("fr-FR");
         const timeStr = date.toLocaleTimeString("fr-FR", {
