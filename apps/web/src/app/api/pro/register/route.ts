@@ -75,7 +75,7 @@ export async function POST(req: Request) {
     // Filtrer les slugs non-null
     const existingSlugs = allProfessionals
       .map((p: { slug: string | null }) => p.slug)
-      .filter((s): s is string => s !== null && s !== undefined);
+      .filter((s: string | null | undefined): s is string => s !== null && s !== undefined);
     const slug = generateUniqueSlug(professionalName, existingSlugs);
 
     const professional = await prisma.professional.create({
