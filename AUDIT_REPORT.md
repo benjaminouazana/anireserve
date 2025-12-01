@@ -284,3 +284,4 @@ Version: 1.0
 4. **Optimiser les performances** (cache, lazy loading)
 5. **Améliorer l'UX** (feedback, messages d'erreur, confirmations)
 
+

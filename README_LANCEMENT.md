@@ -195,3 +195,4 @@ Le projet est **solide et prêt** pour une phase de test utilisateurs intensive.
 **Version** : 1.0.0-beta
 **Statut** : ✅ Prêt pour tests
 
+

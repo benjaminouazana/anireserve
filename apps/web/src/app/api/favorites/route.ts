@@ -53,7 +53,12 @@ export async function GET() {
         })
       : [];
 
-    const ratingsMap = new Map(
+    type RatingData = {
+      avg: number;
+      count: number;
+    };
+
+    const ratingsMap = new Map<number, RatingData>(
       ratingsData.map((r: {
         professionalId: number;
         _avg: { rating: number | null };
@@ -72,7 +77,7 @@ export async function GET() {
         verified: boolean;
       };
     }) => {
-      const ratingData = ratingsMap.get(fav.professional.id) || { avg: 0, count: 0 };
+      const ratingData: RatingData = ratingsMap.get(fav.professional.id) || { avg: 0, count: 0 };
       return {
         id: fav.professional.id,
         name: fav.professional.name,
@@ -206,4 +211,3 @@ export async function DELETE(req: Request) {
     );
   }
 }
-
