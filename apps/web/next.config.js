@@ -3,6 +3,9 @@ const nextConfig = {
   // Configuration pour le monorepo
   transpilePackages: [],
   
+  // Mode strict React
+  reactStrictMode: true,
+  
   // Désactiver ESLint pendant le build (pour déploiement rapide)
   eslint: {
     ignoreDuringBuilds: true,
@@ -12,6 +15,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true, // Temporairement activé pour permettre le build
   },
+  
+  // Configuration pour la production (standalone pour meilleures performances)
+  // output: 'standalone', // Décommentez si vous utilisez Docker ou un déploiement standalone
   
   // Optimisations
   images: {
