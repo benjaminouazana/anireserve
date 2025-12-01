@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     });
     // Filtrer les slugs non-null
     const existingSlugs = allProfessionals
-      .map((p) => p.slug)
+      .map((p: { slug: string | null }) => p.slug)
       .filter((s): s is string => s !== null && s !== undefined);
     const slug = generateUniqueSlug(professionalName, existingSlugs);
 
