@@ -35,7 +35,9 @@ export async function GET() {
     });
 
     // Calculer les notes moyennes
-    const professionalIds = favorites.map((f) => f.professional.id);
+    const professionalIds = favorites.map((f: {
+      professional: { id: number };
+    }) => f.professional.id);
     const ratingsData = professionalIds.length > 0
       ? await prisma.review.groupBy({
           by: ["professionalId"],
@@ -52,10 +54,24 @@ export async function GET() {
       : [];
 
     const ratingsMap = new Map(
-      ratingsData.map((r) => [r.professionalId, { avg: r._avg.rating || 0, count: r._count.rating }])
+      ratingsData.map((r: {
+        professionalId: number;
+        _avg: { rating: number | null };
+        _count: { rating: number };
+      }) => [r.professionalId, { avg: r._avg.rating || 0, count: r._count.rating }])
     );
 
-    const favoritesWithRatings = favorites.map((fav) => {
+    const favoritesWithRatings = favorites.map((fav: {
+      professional: {
+        id: number;
+        name: string;
+        city: string;
+        cities: string | null;
+        serviceType: string;
+        description: string | null;
+        verified: boolean;
+      };
+    }) => {
       const ratingData = ratingsMap.get(fav.professional.id) || { avg: 0, count: 0 };
       return {
         id: fav.professional.id,
