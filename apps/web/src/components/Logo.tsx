@@ -24,8 +24,11 @@ export function Logo({ className = "", width = 300, height = 120, showTagline = 
     }
   };
 
-  // Fallback text logo si aucune image ne fonctionne - avec les couleurs de la charte
-  if (imageError) {
+  // Utiliser directement le fallback text logo (pas de fichier logo pour l'instant)
+  // Si vous ajoutez un logo plus tard, décommentez le code Image ci-dessous
+  const useTextLogo = true; // Passer à false quand vous aurez un logo
+  
+  if (useTextLogo || imageError) {
     return (
       <div className={`${montserrat.variable} font-montserrat ${className}`}>
         <div className="flex items-center gap-2">
@@ -53,40 +56,29 @@ export function Logo({ className = "", width = 300, height = 120, showTagline = 
     );
   }
 
-  return (
-    <div className={`${montserrat.variable} font-montserrat ${className}`}>
-      <Image
-        src={logoSources[currentSrcIndex]}
-        alt="AniReserve - La plateforme de réservation en Israel pour les Français"
-        width={width}
-        height={height}
-        className="object-contain"
-        priority
-        onError={handleError}
-        unoptimized={logoSources[currentSrcIndex].endsWith('.svg')}
-      />
-    </div>
-  );
+  // Code pour charger une image logo (décommentez quand vous aurez un logo)
+  // return (
+  //   <div className={`${montserrat.variable} font-montserrat ${className}`}>
+  //     <Image
+  //       src={logoSources[currentSrcIndex]}
+  //       alt="AniReserve - La plateforme de réservation en Israel pour les Français"
+  //       width={width}
+  //       height={height}
+  //       className="object-contain"
+  //       priority
+  //       onError={handleError}
+  //       unoptimized={logoSources[currentSrcIndex].endsWith('.svg')}
+  //     />
+  //   </div>
+  // );
 }
 
 // Version simplifiée pour les petits espaces
 export function LogoCompact({ className = "", width = 150, height = 60, src = "/logo.png" }: { className?: string; width?: number; height?: number; src?: string }) {
-  const [imageError, setImageError] = useState(false);
-  const [triedSources, setTriedSources] = useState<string[]>([src]);
+  // Utiliser directement le fallback text logo
+  const useTextLogo = true; // Passer à false quand vous aurez un logo
   
-  const logoSources = ["/logo.png", "/logo.jpg", "/logo.jpeg", "/logo.svg", "/logo.webp"];
-  const currentSrc = triedSources[triedSources.length - 1];
-  const nextSource = logoSources.find(s => !triedSources.includes(s));
-
-  const handleError = () => {
-    if (nextSource) {
-      setTriedSources([...triedSources, nextSource]);
-    } else {
-      setImageError(true);
-    }
-  };
-
-  if (imageError && triedSources.length >= logoSources.length) {
+  if (useTextLogo) {
     return (
       <div className={`${montserrat.variable} font-montserrat flex items-center gap-1.5 ${className}`}>
         <span 
@@ -107,18 +99,19 @@ export function LogoCompact({ className = "", width = 150, height = 60, src = "/
     );
   }
 
-  return (
-    <div className={`${montserrat.variable} font-montserrat flex items-center ${className}`}>
-      <Image
-        src={currentSrc}
-        alt="AniReserve Logo"
-        width={width}
-        height={height}
-        className="object-contain"
-        priority
-        onError={handleError}
-      />
-    </div>
-  );
+  // Code pour charger une image logo (décommentez quand vous aurez un logo)
+  // return (
+  //   <div className={`${montserrat.variable} font-montserrat flex items-center ${className}`}>
+  //     <Image
+  //       src={currentSrc}
+  //       alt="AniReserve Logo"
+  //       width={width}
+  //       height={height}
+  //       className="object-contain"
+  //       priority
+  //       onError={handleError}
+  //     />
+  //   </div>
+  // );
 }
 
