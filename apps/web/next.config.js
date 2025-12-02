@@ -6,14 +6,19 @@ const nextConfig = {
   // Mode strict React
   reactStrictMode: true,
   
-  // Désactiver ESLint pendant le build (pour déploiement rapide)
+  // ⚠️ ATTENTION : Les checks sont temporairement désactivés pour permettre le déploiement
+  // TODO : Corriger toutes les erreurs TypeScript puis réactiver ces checks
+  
+  // ESLint - À réactiver après correction des erreurs
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // ⚠️ TEMPORAIRE - À réactiver
   },
   
-  // Désactiver TypeScript errors pendant le build (temporairement pour déploiement)
+  // TypeScript - À réactiver après correction des erreurs
   typescript: {
-    ignoreBuildErrors: true, // Temporairement activé pour permettre le build
+    ignoreBuildErrors: true, // ⚠️ TEMPORAIRE - À réactiver
+    // Une fois les erreurs corrigées, changez en :
+    // ignoreBuildErrors: false,
   },
   
   // Configuration pour la production (standalone pour meilleures performances)
