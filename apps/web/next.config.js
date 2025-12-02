@@ -21,8 +21,8 @@ const nextConfig = {
     // ignoreBuildErrors: false,
   },
   
-  // Configuration pour la production (standalone pour meilleures performances)
-  // output: 'standalone', // Décommentez si vous utilisez Docker ou un déploiement standalone
+  // Configuration pour la production
+  output: 'standalone', // Activé pour meilleures performances en production
   
   // Optimisations
   images: {
@@ -51,6 +51,18 @@ const nextConfig = {
   
   // Compression
   compress: true,
+  
+  // Optimisations supplémentaires
+  poweredByHeader: false, // Masquer le header "X-Powered-By: Next.js"
+  generateEtags: true, // Générer ETags pour le cache
+  
+  // Expérimental : optimisations
+  experimental: {
+    optimizePackageImports: ['react-icons', 'lucide-react'],
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
   
   // Headers de sécurité
   async headers() {
