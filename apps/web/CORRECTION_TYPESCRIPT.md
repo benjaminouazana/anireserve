@@ -99,3 +99,4 @@ typescript: {
 - `src/app/**/page.tsx` - Pages
 - `src/lib/**/*.ts` - Utilitaires
 
+

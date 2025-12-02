@@ -38,8 +38,9 @@ function ProLoginContent() {
 
       router.push("/pro/dashboard");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "Email ou mot de passe incorrect");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Email ou mot de passe incorrect");
     } finally {
       setLoading(false);
     }

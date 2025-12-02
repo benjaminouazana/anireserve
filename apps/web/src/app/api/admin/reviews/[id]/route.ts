@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentAdmin } from "@/lib/auth";
+import type { RouteContext } from "@/types/professional";
 
-export async function DELETE(request: Request, context: any) {
+export async function DELETE(request: Request, context: RouteContext) {
   try {
     const admin = await getCurrentAdmin();
     if (!admin) {

@@ -112,8 +112,9 @@ export default function ProSettingsPage() {
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la sauvegarde");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);
     }
@@ -156,8 +157,9 @@ export default function ProSettingsPage() {
         confirmPassword: "",
       });
       setShowPasswordForm(false);
-    } catch (error: any) {
-      toast.showToast(error.message || "Erreur lors du changement de mot de passe", "error");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      toast.showToast(err.message || "Erreur lors du changement de mot de passe", "error");
     } finally {
       setPasswordLoading(false);
     }

@@ -50,8 +50,9 @@ export default function ClientRegisterPage() {
 
       // Rediriger vers la page de login avec un message de succès
       router.push("/client/login?registered=true");
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de l'inscription");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Erreur lors de l'inscription");
     } finally {
       setLoading(false);
     }
@@ -188,6 +189,7 @@ export default function ClientRegisterPage() {
     </div>
   );
 }
+
 
 
 

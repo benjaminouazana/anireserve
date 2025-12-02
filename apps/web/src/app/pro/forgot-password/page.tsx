@@ -30,8 +30,9 @@ export default function ProForgotPasswordPage() {
 
       setSent(true);
       toast.showToast("Si cet email existe, un lien de réinitialisation a été envoyé.", "success");
-    } catch (err: any) {
-      toast.showToast(err.message || "Erreur lors de l'envoi de l'email", "error");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      toast.showToast(error.message || "Erreur lors de l'envoi de l'email", "error");
     } finally {
       setLoading(false);
     }
@@ -112,6 +113,7 @@ export default function ProForgotPasswordPage() {
     </div>
   );
 }
+
 
 
 

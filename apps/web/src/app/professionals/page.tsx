@@ -4,30 +4,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { generateSlug } from "@/lib/slug";
+import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
-function getProfessionalSlug(pro: any): string {
+function getProfessionalSlug(pro: Professional): string {
   if (pro.slug) return pro.slug;
   return generateSlug(pro.name);
 }
 
-interface Professional {
-  id: number;
-  name: string;
-  email: string;
-  city: string;
+interface ProfessionalWithDetails extends Professional {
   cities: string | null;
-  serviceType: string;
   services: string | null;
-  description: string | null;
-  verified: boolean;
   rating?: number;
   reviewCount?: number;
 }
 
 export default function ProfessionalsPage() {
   const router = useRouter();
-  const [professionals, setProfessionals] = useState<Professional[]>([]);
+  const [professionals, setProfessionals] = useState<ProfessionalWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState("");
   const [searchService, setSearchService] = useState("");

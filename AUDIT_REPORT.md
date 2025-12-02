@@ -285,3 +285,4 @@ Version: 1.0
 5. **Améliorer l'UX** (feedback, messages d'erreur, confirmations)
 
 
+

@@ -9,9 +9,10 @@ import { CITIES, SERVICES, SERVICE_SUBCATEGORIES } from "@/app/pro/register/cons
 import { useToast } from "@/components/ToastProvider";
 import { Logo } from "@/components/Logo";
 import { generateSlug } from "@/lib/slug";
+import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
-function getProfessionalSlug(pro: any): string {
+function getProfessionalSlug(pro: Professional): string {
   if (pro.slug) return pro.slug;
   return generateSlug(pro.name);
 }
@@ -98,9 +99,10 @@ function HomeContent() {
       setTotalPages(data.pagination?.totalPages || 1);
       setTotalResults(data.pagination?.total || professionals.length);
       setHasSearched(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Erreur réseau ou autre - utiliser les données fallback silencieusement
-      console.warn("Erreur chargement pros par défaut, utilisation fallback:", error.message);
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.warn("Erreur chargement pros par défaut, utilisation fallback:", err.message);
       setResults(FALLBACK_PROS.slice(0, 20));
       setTotalPages(1);
       setTotalResults(FALLBACK_PROS.length);
@@ -143,8 +145,9 @@ function HomeContent() {
         const occupiedData = await occupiedResponse.json();
         setOccupiedSlots(occupiedData.occupiedSlots || []);
       }
-    } catch (error: any) {
-      console.error("Erreur lors du chargement des créneaux", error);
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.error("Erreur lors du chargement des créneaux", err);
       toast.showToast("Erreur lors du chargement des créneaux disponibles", "error");
       setAvailableSlots([]);
       setOccupiedSlots([]);
@@ -232,8 +235,9 @@ function HomeContent() {
       setAvailableSlots([]);
       setOccupiedSlots([]);
       setBookingMessage(null);
-    } catch (error: any) {
-      console.error("Erreur recherche professionnels:", error);
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.error("Erreur recherche professionnels:", err);
       toast.showToast("Erreur lors de la recherche. Réessaye plus tard.", "error");
       const filtered = FALLBACK_PROS.filter((pro) => {
         const matchCity = city ? pro.city === city : true;
@@ -330,8 +334,9 @@ function HomeContent() {
         setSelectedPro(null);
         setBookingMessage(null);
       }, 3000);
-    } catch (error: any) {
-      const errorMessage = error.message || "Impossible de créer le rendez-vous. Réessaie plus tard.";
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      const errorMessage = err.message || "Impossible de créer le rendez-vous. Réessaie plus tard.";
       setBookingMessage(`❌ ${errorMessage}`);
       toast.showToast(errorMessage, "error");
     } finally {

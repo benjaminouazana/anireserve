@@ -82,3 +82,4 @@ sudo certbot certonly --webroot -w /var/www/html -d anireserve.com -d www.anires
 4. Tester toutes les fonctionnalités
 5. Corriger progressivement les erreurs TypeScript
 
+

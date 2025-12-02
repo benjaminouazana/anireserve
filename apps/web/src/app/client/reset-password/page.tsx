@@ -60,8 +60,9 @@ function ClientResetPasswordContent() {
       setTimeout(() => {
         router.push("/client/login");
       }, 2000);
-    } catch (err: any) {
-      toast.showToast(err.message || "Erreur lors de la réinitialisation", "error");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      toast.showToast(error.message || "Erreur lors de la réinitialisation", "error");
     } finally {
       setLoading(false);
     }

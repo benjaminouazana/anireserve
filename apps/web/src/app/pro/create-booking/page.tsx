@@ -88,8 +88,9 @@ export default function ProCreateBookingPage() {
       setTimeout(() => {
         router.push("/pro/dashboard");
       }, 2000);
-    } catch (error: any) {
-      toast.showToast(error.message || "Erreur lors de la création de la réservation", "error");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      toast.showToast(err.message || "Erreur lors de la création de la réservation", "error");
     } finally {
       setLoading(false);
     }

@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useToast } from "@/components/ToastProvider";
 import { generateSlug } from "@/lib/slug";
+import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
-function getProfessionalSlug(pro: any): string {
+function getProfessionalSlug(pro: Professional): string {
   if (pro.slug) return pro.slug;
   return generateSlug(pro.name);
 }
@@ -52,9 +53,10 @@ export default function MyFavoritesPage() {
       // Gérer les deux formats possibles : {favorites: [...]} ou [...]
       const favoritesList = Array.isArray(data) ? data : (data.favorites || []);
       setFavorites(favoritesList);
-    } catch (error: any) {
-      console.error("Erreur chargement favoris:", error);
-      toast.showToast(error.message || "Erreur lors du chargement de tes favoris", "error");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.error("Erreur chargement favoris:", err);
+      toast.showToast(err.message || "Erreur lors du chargement de tes favoris", "error");
     } finally {
       setLoading(false);
     }

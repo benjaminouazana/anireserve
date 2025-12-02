@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Professional } from "@/types/professional";
 
 function StarIcon({ filled }: { filled: boolean }) {
   return (
@@ -18,7 +19,7 @@ export function ProfileHeader({
   totalReviews,
   cities,
 }: {
-  professional: any;
+  professional: Professional;
   averageRating: number;
   totalReviews: number;
   cities: string[];

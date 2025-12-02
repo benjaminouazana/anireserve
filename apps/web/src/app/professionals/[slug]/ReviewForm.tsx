@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { Review } from "@/types/professional";
 
 function StarIcon({ 
   filled, 
@@ -38,7 +39,7 @@ export function ReviewForm({
 }: {
   bookingId: number;
   professionalId: number;
-  onSuccess: (review: any) => void;
+  onSuccess: (review: Review) => void;
   onCancel: () => void;
 }) {
   const [rating, setRating] = useState(0);
@@ -76,8 +77,9 @@ export function ReviewForm({
 
       const data = await response.json();
       onSuccess(data.review);
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la création de l'avis");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Erreur lors de la création de l'avis");
     } finally {
       setLoading(false);
     }

@@ -69,3 +69,4 @@ echo ""
 echo "📝 Logs récents :"
 pm2 logs anireserve --lines 5 --nostream
 
+

@@ -166,8 +166,9 @@ export default function AvailabilityPage() {
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la sauvegarde");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);
     }

@@ -41,8 +41,9 @@ export function ImageUploadButton({
 
       const data = await response.json();
       onUpload(data.url);
-    } catch (error: any) {
-      alert(error.message || "Erreur lors de l'upload");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      alert(err.message || "Erreur lors de l'upload");
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -71,6 +72,7 @@ export function ImageUploadButton({
     </>
   );
 }
+
 
 
 

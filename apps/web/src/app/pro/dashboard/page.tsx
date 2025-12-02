@@ -4,9 +4,10 @@ import { getCurrentProfessional } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
 import { generateSlug } from "@/lib/slug";
+import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
-function getProfessionalSlug(pro: any): string {
+function getProfessionalSlug(pro: Professional): string {
   if (pro.slug) return pro.slug;
   return generateSlug(pro.name);
 }

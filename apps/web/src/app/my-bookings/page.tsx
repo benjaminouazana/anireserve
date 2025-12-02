@@ -6,9 +6,10 @@ import Link from "next/link";
 import { ClientLogoutButton } from "./ClientLogoutButton";
 import { CancelBookingButton } from "./CancelBookingButton";
 import { generateSlug } from "@/lib/slug";
+import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
-function getProfessionalSlug(pro: any): string {
+function getProfessionalSlug(pro: Professional): string {
   if (pro.slug) return pro.slug;
   return generateSlug(pro.name);
 }
@@ -60,8 +61,9 @@ export default function MyBookingsPage() {
           console.error("Erreur chargement réservations:", bookingsRes.status);
           setBookings([]);
         }
-      } catch (err: any) {
-        setError(err.message || "Erreur lors du chargement");
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setError(error.message || "Erreur lors du chargement");
       } finally {
         setLoading(false);
       }

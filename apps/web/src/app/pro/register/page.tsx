@@ -82,13 +82,14 @@ export default function ProRegisterPage() {
       }
 
       return data.url;
-    } catch (error: any) {
-      console.error("Erreur handleFileUpload:", error);
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.error("Erreur handleFileUpload:", err);
       // Si c'est une erreur de parsing JSON, donner un message plus clair
-      if (error.message && error.message.includes("JSON")) {
+      if (err.message && err.message.includes("JSON")) {
         throw new Error("Erreur de communication avec le serveur. Veuillez réessayer.");
       }
-      throw error;
+      throw err;
     }
   }
 
@@ -135,9 +136,10 @@ export default function ProRegisterPage() {
       let teoudatZeoutUrl: string;
       try {
         teoudatZeoutUrl = await handleFileUpload(formData.teoudatZeout);
-      } catch (uploadError: any) {
+      } catch (uploadError: unknown) {
+        const err = uploadError instanceof Error ? uploadError : new Error(String(uploadError));
         setUploading(false);
-        setError(uploadError.message || "Erreur lors de l'upload de la Teoudate Zeoute. Veuillez réessayer.");
+        setError(err.message || "Erreur lors de l'upload de la Teoudate Zeoute. Veuillez réessayer.");
         setLoading(false);
         return;
       }
@@ -172,9 +174,10 @@ export default function ProRegisterPage() {
 
       // Rediriger vers la page de vérification
       router.push("/pro/verification-pending");
-    } catch (err: any) {
-      console.error("Erreur inscription complète:", err);
-      setError(err.message || "Erreur lors de l'inscription. Veuillez réessayer.");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error("Erreur inscription complète:", error);
+      setError(error.message || "Erreur lors de l'inscription. Veuillez réessayer.");
       setUploading(false);
       setLoading(false);
     }

@@ -6,9 +6,10 @@ import Link from "next/link";
 import { ClientLogoutButton } from "@/app/my-bookings/ClientLogoutButton";
 import { useToast } from "@/components/ToastProvider";
 import { generateSlug } from "@/lib/slug";
+import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
-function getProfessionalSlug(pro: any): string {
+function getProfessionalSlug(pro: Professional): string {
   if (pro.slug) return pro.slug;
   return generateSlug(pro.name);
 }
@@ -137,8 +138,9 @@ export default function ClientDashboardPage() {
         confirmPassword: "",
       });
       setShowPasswordForm(false);
-    } catch (error: any) {
-      toast.showToast(error.message || "Erreur lors du changement de mot de passe", "error");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      toast.showToast(err.message || "Erreur lors du changement de mot de passe", "error");
     } finally {
       setPasswordLoading(false);
     }

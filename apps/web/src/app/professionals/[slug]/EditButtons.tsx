@@ -70,8 +70,9 @@ export function EditButtons({ professionalId, currentGallery, currentPricing }: 
       toast.showToast("Images mises à jour avec succès !", "success");
       setShowImageModal(false);
       router.refresh();
-    } catch (error: any) {
-      toast.showToast(error.message || "Erreur lors de la sauvegarde", "error");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      toast.showToast(err.message || "Erreur lors de la sauvegarde", "error");
     } finally {
       setSaving(false);
     }
@@ -106,8 +107,9 @@ export function EditButtons({ professionalId, currentGallery, currentPricing }: 
       toast.showToast("Tarifs mis à jour avec succès !", "success");
       setShowPricingModal(false);
       router.refresh();
-    } catch (error: any) {
-      toast.showToast(error.message || "Erreur lors de la sauvegarde", "error");
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      toast.showToast(err.message || "Erreur lors de la sauvegarde", "error");
     } finally {
       setSaving(false);
     }

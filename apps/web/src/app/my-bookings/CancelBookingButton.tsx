@@ -46,8 +46,9 @@ export function CancelBookingButton({
       }
 
       onCancel();
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de l'annulation");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Erreur lors de l'annulation");
     } finally {
       setLoading(false);
     }
