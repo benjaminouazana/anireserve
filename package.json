@@ -19,7 +19,8 @@
     "open:ios": "npx cap open ios",
     "open:android": "npx cap open android",
     "setup:capacitor": "bash scripts/setup-capacitor.sh",
-    "generate:icons": "bash scripts/generate-icons.sh"
+    "generate:icons": "bash scripts/generate-icons.sh",
+    "manage:domains": "node scripts/manage-resend-domains.js"
   },
   "workspaces": [
     "apps/*"
