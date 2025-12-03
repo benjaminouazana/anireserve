@@ -77,8 +77,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    // Pas d'icônes pour éviter les erreurs 404
-    // Le logo est géré par le composant Logo en texte uniquement
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+    ],
   },
   manifest: "/manifest.json",
 };
