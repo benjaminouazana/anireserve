@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import * as emailTemplates from "./email-templates";
 
 // Initialiser Resend (utilise la variable d'environnement RESEND_API_KEY)
 const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
@@ -384,6 +385,35 @@ export async function sendProfessionalPasswordResetEmail(
   }
 }
 
+// Fonction helper pour envoyer un email avec template
+async function sendEmailWithTemplate(
+  to: string,
+  templateFn: (data: any) => { subject: string; html: string },
+  templateData: any,
+  from: string = "AniReserve <noreply@anireserve.com>"
+) {
+  try {
+    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log(`📧 Email (simulé) envoyé à ${to}`, templateData);
+      return { success: true, simulated: true };
+    }
+
+    const template = templateFn(templateData);
+    
+    await resend.emails.send({
+      from,
+      to,
+      subject: template.subject,
+      html: template.html,
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Erreur envoi email:", error);
+    return { success: false, error };
+  }
+}
+
 // Email pour notifier l'admin qu'un nouveau professionnel s'est inscrit
 export async function sendNewProfessionalNotificationToAdmin(
   professionalName: string,
@@ -393,47 +423,11 @@ export async function sendNewProfessionalNotificationToAdmin(
   serviceType: string,
   description: string | null
 ) {
-  try {
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
-      console.log("📧 Email (simulé) - Notification admin : Nouveau professionnel inscrit", email);
-      return { success: true, simulated: true };
-    }
-
-    await resend.emails.send({
-      from: "AniReserve <noreply@anireserve.com>",
-      to: "reservation@anireserve.com",
-      subject: `🔔 Nouvelle inscription professionnel : ${professionalName}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #2FB190;">🔔 Nouvelle inscription professionnel</h1>
-          <p>Bonjour,</p>
-          <p>Un nouveau professionnel vient de s'inscrire sur AniReserve et son dossier est en attente de validation.</p>
-          <div style="background: #f0f9f7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2FB190;">
-            <h2 style="margin-top: 0; color: #18223b;">Informations du professionnel</h2>
-            <p style="margin: 5px 0;"><strong>👤 Nom :</strong> ${professionalName}</p>
-            <p style="margin: 5px 0;"><strong>📧 Email :</strong> ${email}</p>
-            ${phone ? `<p style="margin: 5px 0;"><strong>📱 Téléphone :</strong> ${phone}</p>` : ''}
-            <p style="margin: 5px 0;"><strong>📍 Ville :</strong> ${city}</p>
-            <p style="margin: 5px 0;"><strong>💼 Service :</strong> ${serviceType}</p>
-            ${description ? `<p style="margin: 5px 0;"><strong>📝 Description :</strong> ${description}</p>` : ''}
-          </div>
-          <p><strong>⏳ Action requise :</strong> Connectez-vous à l'espace admin pour valider ou rejeter ce profil.</p>
-          <p style="margin-top: 20px;">
-            <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/admin/professionals/pending" 
-               style="background: #2FB190; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">
-              Accéder à l'espace admin
-            </a>
-          </p>
-          <p style="color: #71717a; font-size: 12px; margin-top: 30px;">AniReserve - La plateforme de réservation en Israël pour les Français</p>
-        </div>
-      `,
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Erreur envoi email admin:", error);
-    return { success: false, error };
-  }
+  return sendEmailWithTemplate(
+    "reservation@anireserve.com",
+    emailTemplates.newProfessionalAdmin,
+    { professionalName, email, phone, city, serviceType, description }
+  );
 }
 
 // Email pour le professionnel : confirmation que son dossier est en cours de traitement
@@ -441,49 +435,36 @@ export async function sendProfessionalRegistrationConfirmation(
   to: string,
   professionalName: string
 ) {
-  try {
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
-      console.log("📧 Email (simulé) - Confirmation inscription envoyée au pro", to);
-      return { success: true, simulated: true };
-    }
+  return sendEmailWithTemplate(
+    to,
+    emailTemplates.professionalRegistrationConfirmation,
+    { professionalName }
+  );
+}
 
-    await resend.emails.send({
-      from: "AniReserve <noreply@anireserve.com>",
-      to,
-      subject: "✅ Votre inscription AniReserve est en cours de traitement",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #2FB190;">✅ Inscription reçue !</h1>
-          <p>Bonjour ${professionalName},</p>
-          <p>Nous avons bien reçu votre demande d'inscription sur <strong>AniReserve</strong>.</p>
-          <div style="background: #f0f9f7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2FB190;">
-            <p style="margin: 0;"><strong>⏳ Statut :</strong> Votre dossier est en cours de traitement</p>
-            <p style="margin: 10px 0 0 0;">Notre équipe examine votre profil et vos documents. Vous recevrez un email dès que votre compte sera validé.</p>
-          </div>
-          <p><strong>📋 Prochaines étapes :</strong></p>
-          <ul style="line-height: 1.8;">
-            <li>Vérification de vos documents (Teoudate Zeoute)</li>
-            <li>Validation de votre profil professionnel</li>
-            <li>Activation de votre compte</li>
-          </ul>
-          <p><strong>⏰ Délai de traitement :</strong> Généralement sous 24-48 heures</p>
-          <p>Une fois votre compte validé, vous pourrez :</p>
-          <ul style="line-height: 1.8;">
-            <li>Gérer votre planning de disponibilités</li>
-            <li>Recevoir des demandes de réservation</li>
-            <li>Apparaître dans les résultats de recherche</li>
-          </ul>
-          <p>En cas de question, n'hésitez pas à nous contacter à <a href="mailto:contact@anireserve.com">contact@anireserve.com</a></p>
-          <p style="color: #71717a; font-size: 12px; margin-top: 30px;">AniReserve - La plateforme de réservation en Israël pour les Français</p>
-        </div>
-      `,
-    });
+// Nouvelle fonction : Email de validation de profil professionnel
+export async function sendProfessionalValidated(
+  to: string,
+  professionalName: string
+) {
+  return sendEmailWithTemplate(
+    to,
+    emailTemplates.professionalValidated,
+    { professionalName }
+  );
+}
 
-    return { success: true };
-  } catch (error) {
-    console.error("Erreur envoi email confirmation pro:", error);
-    return { success: false, error };
-  }
+// Nouvelle fonction : Email de rejet de profil professionnel
+export async function sendProfessionalRejected(
+  to: string,
+  professionalName: string,
+  reason?: string
+) {
+  return sendEmailWithTemplate(
+    to,
+    emailTemplates.professionalRejected,
+    { professionalName, reason }
+  );
 }
 
 // Email générique pour changement de statut de réservation
