@@ -30,7 +30,7 @@ export function Logo({ className = "", width = 300, height = 120, showTagline = 
       </div>
       {showTagline && (
         <p className="mt-3 text-sm text-zinc-600 font-medium">
-          La plateforme de réservation en Israel<br />Pour les Français.
+          C'est une plateforme pour les français en Israël
         </p>
       )}
     </div>

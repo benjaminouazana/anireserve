@@ -18,26 +18,24 @@ function getProfessionalSlug(pro: Professional): string {
 }
 
 // Données mockées de secours
-const FALLBACK_PROS = [
+const FALLBACK_PROS: Professional[] = [
   {
     id: 1,
     name: "Sarah Coiffure",
     city: "Tel Aviv",
-    service: "Coiffeur",
-    languages: ["Français", "Hébreu"],
+    serviceType: "Coiffeur",
+    languages: "Français, Hébreu",
     description: "Spécialisée en coupes modernes et coloration.",
   },
   {
     id: 2,
     name: "Dr Cohen",
     city: "Jérusalem",
-    service: "Médecin",
-    languages: ["Français", "Anglais"],
+    serviceType: "Médecin",
+    languages: "Français, Anglais",
     description: "Médecin généraliste, suivi famille et enfants.",
   },
 ];
-
-type Professional = (typeof FALLBACK_PROS)[number];
 
 function HomeContent() {
   const toast = useToast();
@@ -241,7 +239,7 @@ function HomeContent() {
       toast.showToast("Erreur lors de la recherche. Réessaye plus tard.", "error");
       const filtered = FALLBACK_PROS.filter((pro) => {
         const matchCity = city ? pro.city === city : true;
-        const matchService = service ? pro.service === service : true;
+        const matchService = service ? pro.serviceType === service : true;
         return matchCity && matchService;
       });
       setResults(filtered);
@@ -399,7 +397,7 @@ function HomeContent() {
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <header className="mb-6 sm:mb-8 flex items-center justify-between gap-3 sm:gap-4 flex-wrap">
           <div>
-            <Logo className="mb-2" width={350} height={140} />
+            <Logo className="mb-2" width={350} height={140} showTagline={true} />
             <h1 className="sr-only">Trouvez votre professionnel en Israël - AniReserve</h1>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -646,20 +644,20 @@ function HomeContent() {
                               {pro.name}
                             </h3>
                           </Link>
-                          {"verified" in pro && (pro as any).verified && (
+                          {pro.verified && (
                             <span className="text-xs text-blue-600">✓</span>
                           )}
                         </div>
                         <p className="text-xs text-zinc-500 truncate">
-                          {pro.service} · {pro.city}
+                          {pro.serviceType} · {pro.city}
                         </p>
-                        {"averageRating" in pro && (pro as any).averageRating > 0 && (
+                        {pro.averageRating && pro.averageRating > 0 && (
                           <div className="mt-1 flex items-center gap-1">
                             <span className="text-xs font-medium text-amber-600">
-                              ⭐ {(pro as any).averageRating.toFixed(1)}
+                              ⭐ {pro.averageRating.toFixed(1)}
                             </span>
                             <span className="text-xs text-zinc-400">
-                              ({(pro as any).totalReviews || 0} avis)
+                              ({(pro.totalReviews || 0)} avis)
                             </span>
                           </div>
                         )}
