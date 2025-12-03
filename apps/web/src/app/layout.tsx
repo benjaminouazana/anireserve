@@ -77,17 +77,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      // Logo désactivé temporairement - le composant Logo gère le fallback
-      // { url: "/logo.png", type: "image/png", sizes: "32x32" },
-      // { url: "/logo.png", type: "image/png", sizes: "192x192" },
-      // { url: "/logo.png", type: "image/png", sizes: "512x512" },
-    ],
-    apple: [
-      // Logo désactivé temporairement - le composant Logo gère le fallback
-      // { url: "/logo.png", sizes: "180x180", type: "image/png" },
-    ],
+    // Pas d'icônes pour éviter les erreurs 404
+    // Le logo est géré par le composant Logo en texte uniquement
   },
   manifest: "/manifest.json",
 };
