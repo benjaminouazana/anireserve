@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { generateUniqueSlug } from "@/lib/slug";
+import { sendNewProfessionalNotificationToAdmin, sendProfessionalRegistrationConfirmation } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -108,6 +109,29 @@ export async function POST(req: Request) {
         status: true,
       },
     });
+
+    // Envoyer les emails (ne pas bloquer la réponse si l'email échoue)
+    try {
+      // Email à l'admin
+      await sendNewProfessionalNotificationToAdmin(
+        professionalName,
+        email,
+        phone || null,
+        city,
+        serviceType,
+        description || null
+      );
+
+      // Email au professionnel
+      await sendProfessionalRegistrationConfirmation(
+        email,
+        professionalName
+      );
+    } catch (emailError: unknown) {
+      // Logger l'erreur mais ne pas faire échouer l'inscription
+      const errorMessage = emailError instanceof Error ? emailError.message : "Erreur inconnue";
+      console.error("Erreur envoi emails d'inscription:", errorMessage);
+    }
 
     return NextResponse.json(
       {
