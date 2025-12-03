@@ -60,13 +60,14 @@ export default function AvailabilityPage() {
             const converted = { ...defaultAvailability };
             Object.keys(converted).forEach((day) => {
               if (day === "slotDuration" || day === "breakStart" || day === "breakEnd") return;
+              const dayKey = day as keyof Availability;
               const dayData = parsed[day];
-              if (dayData) {
+              if (dayData && (dayKey === "monday" || dayKey === "tuesday" || dayKey === "wednesday" || dayKey === "thursday" || dayKey === "friday" || dayKey === "saturday" || dayKey === "sunday")) {
                 if (dayData.slots && Array.isArray(dayData.slots)) {
-                  (converted as any)[day] = dayData as DaySchedule;
+                  converted[dayKey] = dayData as DaySchedule;
                 } else if (dayData.start && dayData.end) {
                   // Ancien format : convertir en nouveau format
-                  (converted as any)[day] = {
+                  converted[dayKey] = {
                     enabled: dayData.enabled || false,
                     slots: [{ start: dayData.start, end: dayData.end }],
                   };

@@ -132,7 +132,7 @@ export default function FAQPage() {
             <button
               key={cat.key}
               onClick={() => {
-                setSelectedCategory(cat.key as any);
+                setSelectedCategory(cat.key as "client" | "professional" | "general");
                 setOpenIndex(null);
               }}
               className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
