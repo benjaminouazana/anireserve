@@ -21,6 +21,22 @@ export const metadata: Metadata = {
   authors: [{ name: "AniReserve" }],
   creator: "AniReserve",
   publisher: "AniReserve",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover",
+  },
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#2FB190" },
+    { media: "(prefers-color-scheme: dark)", color: "#18223b" },
+  ],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "AniReserve",
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -67,6 +83,7 @@ export const metadata: Metadata = {
       // { url: "/logo.png", sizes: "180x180", type: "image/png" },
     ],
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -76,8 +93,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="AniReserve" />
+      </head>
       <body
-        className={`${montserrat.variable} font-montserrat antialiased flex flex-col min-h-screen`}
+        className={`${montserrat.variable} font-montserrat antialiased flex flex-col`}
+        style={{ minHeight: "100vh", minHeight: "100dvh", height: "100vh", height: "100dvh", overflow: "hidden" }}
         suppressHydrationWarning
       >
         <ThemeProvider>

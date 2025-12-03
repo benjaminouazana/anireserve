@@ -1,0 +1,19 @@
+{
+  "name": "AniReserve - Réservation professionnels en Israël",
+  "short_name": "AniReserve",
+  "description": "Plateforme de réservation pour les français en Israël",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f0f9f7",
+  "theme_color": "#2FB190",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
+
