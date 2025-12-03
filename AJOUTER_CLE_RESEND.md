@@ -3,7 +3,7 @@
 ## ✅ Votre Clé API Resend
 
 ```
-re_bLnNNb2M_4vhg9pi2hr7q7DPM7xqZJbVD
+re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx
 ```
 
 ---
@@ -13,7 +13,7 @@ re_bLnNNb2M_4vhg9pi2hr7q7DPM7xqZJbVD
 ### Option 1 : Commande Rapide (Tout en Une)
 
 ```bash
-ssh root@72.61.103.149 "cd /root/anireserve/apps/web && echo 'RESEND_API_KEY=re_bLnNNb2M_4vhg9pi2hr7q7DPM7xqZJbVD' >> .env && pm2 restart anireserve && echo '✅ Clé API ajoutée et application redémarrée'"
+ssh root@72.61.103.149 "cd /root/anireserve/apps/web && sed -i 's/RESEND_API_KEY=.*/RESEND_API_KEY=re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx/' .env || echo 'RESEND_API_KEY=re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx' >> .env && pm2 restart anireserve && echo '✅ Clé API mise à jour et application redémarrée'"
 ```
 
 ### Option 2 : Étape par Étape
@@ -28,12 +28,17 @@ cd /root/anireserve/apps/web
 # 3. Vérifier si .env existe
 ls -la .env
 
-# 4. Ajouter la clé API
-echo 'RESEND_API_KEY=re_bLnNNb2M_4vhg9pi2hr7q7DPM7xqZJbVD' >> .env
+# 4. Mettre à jour la clé API (remplace l'ancienne si elle existe)
+sed -i 's/RESEND_API_KEY=.*/RESEND_API_KEY=re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx/' .env
 
-# OU si le fichier existe déjà, l'éditer :
+# OU si la ligne n'existe pas, l'ajouter :
+if ! grep -q "RESEND_API_KEY" .env; then
+  echo 'RESEND_API_KEY=re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx' >> .env
+fi
+
+# OU éditer manuellement :
 nano .env
-# Ajouter la ligne : RESEND_API_KEY=re_bLnNNb2M_4vhg9pi2hr7q7DPM7xqZJbVD
+# Modifier ou ajouter la ligne : RESEND_API_KEY=re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx
 # Sauvegarder : Ctrl+O, puis Ctrl+X
 
 # 5. Vérifier que la clé est bien ajoutée
@@ -60,7 +65,7 @@ cat .env | grep RESEND_API_KEY
 
 **Résultat attendu** :
 ```
-RESEND_API_KEY=re_bLnNNb2M_4vhg9pi2hr7q7DPM7xqZJbVD
+RESEND_API_KEY=re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx
 ```
 
 ---
