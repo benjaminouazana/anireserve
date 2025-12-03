@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { IMAGE_FORMATS, ALLOWED_MIME_TYPES, isImageFormatSupported, isMimeTypeSupported } from "@/lib/image-formats";
 
 // Configuration pour s'assurer que la route retourne toujours du JSON
 export const runtime = "nodejs";
@@ -42,22 +43,17 @@ export async function POST(req: Request) {
       );
     }
 
-    // Vérifier le type de fichier (très permissif pour les photos depuis mobile)
+    // Vérifier le type de fichier avec tous les formats supportés
     const fileExtension = file.name.split(".").pop()?.toLowerCase();
-    const allowedExtensions = ["jpg", "jpeg", "png", "webp", "pdf", "heic", "heif", "gif"];
-    const allowedMimeTypes = [
-      "image/jpeg", "image/jpg", "image/png", "image/webp", 
-      "application/pdf", "image/heic", "image/heif", "image/gif",
-      "application/octet-stream" // Certains téléphones envoient ce type
-    ];
     
     // Accepter si l'extension est valide OU si le type MIME est valide
-    const isValidExtension = fileExtension && allowedExtensions.includes(fileExtension);
-    const isValidMimeType = file.type && (allowedMimeTypes.includes(file.type) || file.type.startsWith("image/"));
+    const isValidExtension = fileExtension && isImageFormatSupported(file.name);
+    const isValidMimeType = file.type && (isMimeTypeSupported(file.type) || file.type.startsWith("image/") || file.type === "application/pdf" || file.type === "application/octet-stream");
     
     if (!isValidExtension && !isValidMimeType) {
+      const supportedFormats = IMAGE_FORMATS.join(", ").toUpperCase();
       return NextResponse.json(
-        { error: `Type de fichier non autorisé. Utilisez JPG, PNG, WEBP ou PDF. Type détecté: ${file.type || "inconnu"}, Extension: ${fileExtension || "inconnue"}` },
+        { error: `Type de fichier non autorisé. Formats supportés: ${supportedFormats}. Type détecté: ${file.type || "inconnu"}, Extension: ${fileExtension || "inconnue"}` },
         { status: 400, headers: jsonHeaders }
       );
     }

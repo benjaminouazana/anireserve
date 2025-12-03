@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { ACCEPT_IMAGE_FORMATS, isImageFormatSupported, isMimeTypeSupported } from "@/lib/image-formats";
 
 export function ImageUploadButton({
   onUpload,
@@ -14,8 +15,10 @@ export function ImageUploadButton({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Veuillez sélectionner une image");
+    // Vérifier le format avec tous les formats supportés
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    if (!isImageFormatSupported(file.name) && !isMimeTypeSupported(file.type)) {
+      alert(`Format non supporté. Formats acceptés: ${ACCEPT_IMAGE_FORMATS}`);
       return;
     }
 
@@ -57,7 +60,7 @@ export function ImageUploadButton({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept={ACCEPT_IMAGE_FORMATS}
         onChange={handleFileSelect}
         className="hidden"
       />

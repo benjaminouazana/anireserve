@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentProfessional } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { isImageFormatSupported, isMimeTypeSupported } from "@/lib/image-formats";
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +17,14 @@ export async function POST(req: Request) {
     if (!file) {
       return NextResponse.json(
         { error: "Aucun fichier fourni" },
+        { status: 400 }
+      );
+    }
+
+    // Vérifier le format de l'image
+    if (!isImageFormatSupported(file.name) && !isMimeTypeSupported(file.type)) {
+      return NextResponse.json(
+        { error: "Format d'image non supporté" },
         { status: 400 }
       );
     }

@@ -418,13 +418,13 @@ export default function ProRegisterPage() {
                   Teoudate Zeoute * (carte d'identité israélienne)
                 </label>
                 <p className="mb-2 text-xs text-zinc-500">
-                  Upload une photo ou scan de ta Teoudate Zeoute (PDF, JPG, PNG - max 5MB)
+                  Upload une photo ou scan de ta Teoudate Zeoute (JPG, PNG, WEBP, PDF, HEIC, etc. - max 10MB)
                 </p>
                 <input
                   id="teoudatZeout"
                   type="file"
                   required
-                  accept="image/*,.pdf"
+                  accept=".jpg,.jpeg,.png,.gif,.webp,.avif,.heic,.heif,.bmp,.tiff,.tif,.raw,.psd,.xcf,.svg,.ai,.eps,.pdf,.apng"
                   capture="environment"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
