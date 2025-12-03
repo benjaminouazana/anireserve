@@ -27,7 +27,17 @@ async function listDomains() {
     console.log('📋 Domaines disponibles:', JSON.stringify(domains, null, 2));
     return domains;
   } catch (error) {
-    console.error('❌ Erreur lors de la récupération des domaines:', error.message);
+    if (error.message && error.message.includes('restricted_api_key')) {
+      console.error('\n❌ ERREUR : Votre clé API est restreinte !');
+      console.error('📝 Solution :');
+      console.error('   1. Allez sur https://resend.com/api-keys');
+      console.error('   2. Créez une nouvelle clé API avec "Full access" ou "Manage domains"');
+      console.error('   3. Mettez à jour RESEND_API_KEY dans apps/web/.env.local');
+      console.error('   4. Réessayez la commande\n');
+      console.error('📚 Guide complet : CREER_CLE_API_RESEND_COMPLETE.md\n');
+    } else {
+      console.error('❌ Erreur lors de la récupération des domaines:', error.message);
+    }
     throw error;
   }
 }
@@ -49,7 +59,17 @@ async function createDomain(domainName) {
     console.log('✅ Domaine créé avec succès:', JSON.stringify(domain, null, 2));
     return domain;
   } catch (error) {
-    console.error('❌ Erreur lors de la création du domaine:', error.message);
+    if (error.message && error.message.includes('restricted_api_key')) {
+      console.error('\n❌ ERREUR : Votre clé API est restreinte !');
+      console.error('📝 Solution :');
+      console.error('   1. Allez sur https://resend.com/api-keys');
+      console.error('   2. Créez une nouvelle clé API avec "Full access" ou "Manage domains"');
+      console.error('   3. Mettez à jour RESEND_API_KEY dans apps/web/.env.local');
+      console.error('   4. Réessayez la commande\n');
+      console.error('📚 Guide complet : CREER_CLE_API_RESEND_COMPLETE.md\n');
+    } else {
+      console.error('❌ Erreur lors de la création du domaine:', error.message);
+    }
     throw error;
   }
 }
