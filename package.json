@@ -12,7 +12,14 @@
     "test": "turbo test",
     "dev:web": "npm run dev --workspace web",
     "dev:api": "npm run start:dev --workspace api",
-    "dev:mobile": "npm run start --workspace mobile"
+    "dev:mobile": "npm run start --workspace mobile",
+    "build:web": "cd apps/web && npm run build",
+    "sync:ios": "npm run build:web && npx cap sync ios",
+    "sync:android": "npm run build:web && npx cap sync android",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android",
+    "setup:capacitor": "bash scripts/setup-capacitor.sh",
+    "generate:icons": "bash scripts/generate-icons.sh"
   },
   "workspaces": [
     "apps/*"

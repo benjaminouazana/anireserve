@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "./ThemeProvider";
 import { Footer } from "@/components/Footer";
 import { ToastProvider } from "@/components/ToastProvider";
+import "./sw-register";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
