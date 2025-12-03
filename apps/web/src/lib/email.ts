@@ -1,8 +1,8 @@
 import { Resend } from "resend";
 import * as emailTemplates from "./email-templates";
 
-// Initialiser Resend (utilise la variable d'environnement RESEND_API_KEY)
-const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
+// Initialiser Resend (utilise la variable d'environnement RESEND_API_KEY ou la clé par défaut)
+const resend = new Resend(process.env.RESEND_API_KEY || "re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx");
 
 // Email pour le client : demande de réservation créée (en attente)
 export async function sendBookingRequestEmailToClient(
