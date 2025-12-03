@@ -34,8 +34,13 @@ export const metadata: Metadata = {
   ],
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "AniReserve",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
   formatDetection: {
     email: false,
@@ -93,15 +98,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <head>
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="AniReserve" />
-      </head>
       <body
         className={`${montserrat.variable} font-montserrat antialiased flex flex-col`}
-        style={{ minHeight: "100vh", minHeight: "100dvh", height: "100vh", height: "100dvh", overflow: "hidden" }}
+        style={{ 
+          minHeight: "100vh",
+          minHeight: "100dvh",
+          height: "100vh",
+          height: "100dvh",
+          position: "fixed",
+          width: "100%",
+          overflowY: "auto",
+          overflowX: "hidden"
+        }}
         suppressHydrationWarning
       >
         <ThemeProvider>

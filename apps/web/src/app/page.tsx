@@ -386,7 +386,7 @@ function HomeContent() {
   }
 
   return (
-    <div className="h-screen w-full font-sans text-zinc-900 overflow-y-auto" style={{ background: "linear-gradient(to bottom right, #f0f9f7, #fffef0, #f0f4f8)", minHeight: "100vh", minHeight: "100dvh" }}>
+    <div className="w-full font-sans text-zinc-900 overflow-y-auto" style={{ background: "linear-gradient(to bottom right, #f0f9f7, #fffef0, #f0f4f8)", minHeight: "100vh", minHeight: "100dvh", minHeight: "-webkit-fill-available" }}>
       {/* Background decoration */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-0 -left-4 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ backgroundColor: "#2FB190" }}></div>
