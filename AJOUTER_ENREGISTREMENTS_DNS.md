@@ -12,7 +12,7 @@ Connectez-vous à votre panneau Hostinger et allez dans **DNS** pour le domaine 
 
 - **Type :** `TXT`
 - **Nom :** `resend._domainkey`
-- **Valeur :** `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9KJJKjGwWQaRNGhOcpRN6jFPtpwEUM+fqoOiLIl8//qyq0tF1y9weuc60WxcOwyeU0M5fv1OQWsKhfYHZgmKk6wZ/QZp3ADC2Qpe4/agqvWE0A5FbeugjbcsAWADkRN5O/NmhbwlRLOxRBiBrhJhFu+q2uDNKk7B/TBYF8qpgdQIDAQAB`
+- **Valeur :** `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCweuRDKz9ShnlvlU0mfZlvBLSuzG2jrZaC6jDWO6mC8c4tTHb9GzbuzXe8VC3ho/Wdfogc/LrLBb6N/MWrQV6Eu7jb0b/1AN9QQIx4bhmEOG1oU3JxhvLmQg2LLUW8/hOQDTEhBueue8qLAR2+i0MphUTlJBY2Azpro1faUZxlCQIDAQAB`
 - **TTL :** `3600` (ou Auto)
 
 ### 2. Enregistrement SPF (TXT)
@@ -26,7 +26,7 @@ Connectez-vous à votre panneau Hostinger et allez dans **DNS** pour le domaine 
 
 - **Type :** `MX`
 - **Nom :** `send`
-- **Valeur :** `feedback-smtp.us-east-1.amazonses.com`
+- **Valeur :** `feedback-smtp.eu-west-1.amazonses.com`
 - **Priorité :** `10`
 - **TTL :** `3600` (ou Auto)
 
@@ -70,7 +70,7 @@ Dans le panneau DNS de Hostinger, vous devriez voir quelque chose comme :
 Type    Nom                    Valeur                                    TTL
 TXT     resend._domainkey      p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBg...  3600
 TXT     send                   v=spf1 include:amazonses.com ~all         3600
-MX      send                   feedback-smtp.us-east-1.amazonses.com      3600
+MX      send                   feedback-smtp.eu-west-1.amazonses.com     3600
 ```
 
 ## ⚠️ Notes Importantes
@@ -101,4 +101,5 @@ MX      send                   feedback-smtp.us-east-1.amazonses.com      3600
 ---
 
 **Une fois le domaine vérifié, vos emails seront automatiquement envoyés depuis `noreply@anireserve.com` !** 🎉
+
 

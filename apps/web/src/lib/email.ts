@@ -424,7 +424,7 @@ export async function sendNewProfessionalNotificationToAdmin(
   description: string | null
 ) {
   return sendEmailWithTemplate(
-    "reservation@anireserve.com",
+    "admin@anireserve.com",
     emailTemplates.newProfessionalAdmin,
     { professionalName, email, phone, city, serviceType, description }
   );

@@ -26,3 +26,5 @@ export { resend };
 // Pour utiliser dans d'autres fichiers :
 // import { resend } from '@/lib/resend-config';
 
+
+

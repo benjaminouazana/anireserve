@@ -183,3 +183,5 @@ Si vous voyez les valeurs attendues, c'est bon !
 
 **Résumé :** Tout se fait depuis votre Mac, pas besoin de se connecter au serveur pour gérer les domaines Resend ! 🎉
 
+
+

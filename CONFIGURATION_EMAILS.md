@@ -202,3 +202,5 @@ NEXT_PUBLIC_APP_URL=https://anireserve.com
 
 **Status** : ✅ **Code prêt - Configuration Resend requise**
 
+
+

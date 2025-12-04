@@ -18,9 +18,11 @@ function ProResetPasswordContent() {
   useEffect(() => {
     const tokenParam = searchParams?.get("token");
     const emailParam = searchParams?.get("email");
-    if (tokenParam && emailParam) {
+    if (tokenParam) {
       setToken(tokenParam);
-      setEmail(emailParam);
+      if (emailParam) {
+        setEmail(emailParam);
+      }
     }
   }, [searchParams]);
 
@@ -37,7 +39,7 @@ function ProResetPasswordContent() {
       return;
     }
 
-    if (!token || !email) {
+    if (!token) {
       toast.showToast("Lien de réinitialisation invalide", "error");
       return;
     }
@@ -68,7 +70,7 @@ function ProResetPasswordContent() {
     }
   }
 
-  if (!token || !email) {
+  if (!token) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 font-sans text-zinc-900 flex items-center justify-center px-4">
         <div className="w-full max-w-md">

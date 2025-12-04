@@ -228,3 +228,5 @@ await resend.emails.send({
 
 **Note** : Les templates sur Resend permettent de modifier facilement le design sans toucher au code.
 
+
+

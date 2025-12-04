@@ -43,18 +43,28 @@ model Professional {
   bookings             Booking[]
   favorites            Favorite[]
   reviews              Review[]
+  notes                ClientNote[]
 }
 
 model Client {
   id                   Int        @id @default(autoincrement())
   name                 String
+  firstName            String?
+  lastName             String?
   email                String     @unique
+  phone                String?
+  city                 String?
+  address              String?
+  profileImage         String?
   password             String?
   passwordResetToken   String?
   passwordResetExpires DateTime?  @db.Timestamp(6)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
   bookings             Booking[]
   favorites            Favorite[]
   reviews              Review[]
+  notes                ClientNote[]
 }
 
 model Booking {
@@ -106,6 +116,21 @@ model Favorite {
   professional   Professional @relation(fields: [professionalId], references: [id])
 
   @@unique([clientId, professionalId])
+}
+
+model ClientNote {
+  id             Int          @id @default(autoincrement())
+  clientId       Int
+  professionalId Int
+  note           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  client         Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, professionalId])
+  @@index([clientId])
+  @@index([professionalId])
 }
 
 model Admin {

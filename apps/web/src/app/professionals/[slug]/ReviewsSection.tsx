@@ -43,6 +43,37 @@ export function ReviewsSection({
   const [bookingId, setBookingId] = useState<number | null>(
     reviewBookingId ? parseInt(reviewBookingId) : null
   );
+  const [canReview, setCanReview] = useState<{
+    canReview: boolean;
+    reason: string | null;
+    bookingId: number | null;
+  } | null>(null);
+  const [loadingCanReview, setLoadingCanReview] = useState(true);
+
+  useEffect(() => {
+    async function checkCanReview() {
+      setLoadingCanReview(true);
+      try {
+        const res = await fetch(`/api/reviews/can-review?professionalId=${professionalId}`, {
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCanReview(data);
+          // Si on peut laisser un avis et qu'on a un bookingId depuis l'URL, l'utiliser
+          if (data.canReview && data.bookingId && reviewBookingId) {
+            setBookingId(data.bookingId);
+            setShowReviewForm(true);
+          }
+        }
+      } catch (error) {
+        console.error("Erreur vérification avis:", error);
+      } finally {
+        setLoadingCanReview(false);
+      }
+    }
+    checkCanReview();
+  }, [professionalId, reviewBookingId]);
 
   function formatDate(date: Date | string) {
     const d = new Date(date);
@@ -56,6 +87,14 @@ export function ReviewsSection({
   function handleReviewAdded(newReview: Review) {
     setReviews([newReview, ...reviews]);
     setShowReviewForm(false);
+    setCanReview({ canReview: false, reason: "already_reviewed", bookingId: null });
+  }
+
+  function handleLeaveReviewClick() {
+    if (canReview?.canReview && canReview.bookingId) {
+      setBookingId(canReview.bookingId);
+      setShowReviewForm(true);
+    }
   }
 
   return (
@@ -70,6 +109,14 @@ export function ReviewsSection({
             </p>
           )}
         </div>
+        {!loadingCanReview && canReview?.canReview && !showReviewForm && (
+          <button
+            onClick={handleLeaveReviewClick}
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
+          >
+            ⭐ Laisser un avis
+          </button>
+        )}
       </div>
 
       {reviews.length === 0 ? (
@@ -77,6 +124,19 @@ export function ReviewsSection({
           <p className="text-sm text-zinc-500">
             Aucun avis pour le moment. Sois le premier à laisser un avis !
           </p>
+          {!loadingCanReview && canReview?.canReview && !showReviewForm && (
+            <button
+              onClick={handleLeaveReviewClick}
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
+            >
+              ⭐ Laisser un avis
+            </button>
+          )}
+          {!loadingCanReview && canReview && !canReview.canReview && canReview.reason === "not_logged_in" && (
+            <p className="mt-4 text-xs text-zinc-400">
+              Connecte-toi pour laisser un avis après une réservation confirmée
+            </p>
+          )}
         </div>
       ) : (
         <div className="space-y-6">

@@ -41,3 +41,5 @@ echo "  1. Vérifiez les icônes générées"
 echo "  2. Utilisez Capacitor Assets pour générer les icônes iOS/Android :"
 echo "     npx @capacitor/assets generate"
 
+
+

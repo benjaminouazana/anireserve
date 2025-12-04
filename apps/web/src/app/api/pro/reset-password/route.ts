@@ -6,9 +6,9 @@ export async function POST(req: Request) {
   try {
     const { token, email, newPassword } = await req.json();
 
-    if (!token || !email || !newPassword) {
+    if (!token || !newPassword) {
       return NextResponse.json(
-        { error: "Tous les champs sont requis" },
+        { error: "Le token et le nouveau mot de passe sont requis" },
         { status: 400 }
       );
     }
@@ -20,10 +20,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Chercher le professionnel
-    const professional = await prisma.professional.findUnique({
-      where: { email },
-    });
+    // Chercher le professionnel par token (plus sécurisé que par email)
+    const professional = email 
+      ? await prisma.professional.findUnique({ where: { email } })
+      : await prisma.professional.findFirst({ where: { passwordResetToken: token } });
 
     if (!professional) {
       return NextResponse.json(
@@ -32,16 +32,32 @@ export async function POST(req: Request) {
       );
     }
 
-    // TODO: Vérifier le token et sa date d'expiration
+    // Vérifier que le token correspond
+    if (!professional.passwordResetToken || professional.passwordResetToken !== token) {
+      return NextResponse.json(
+        { error: "Lien de réinitialisation invalide ou expiré" },
+        { status: 400 }
+      );
+    }
+
+    // Vérifier que le token n'a pas expiré
+    if (!professional.passwordResetExpires || professional.passwordResetExpires < new Date()) {
+      return NextResponse.json(
+        { error: "Le lien de réinitialisation a expiré. Veuillez en demander un nouveau." },
+        { status: 400 }
+      );
+    }
 
     // Hasher le nouveau mot de passe
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Mettre à jour le mot de passe
+    // Mettre à jour le mot de passe et supprimer le token
     await prisma.professional.update({
-      where: { email },
+      where: { id: professional.id },
       data: {
         password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null,
       },
     });
 

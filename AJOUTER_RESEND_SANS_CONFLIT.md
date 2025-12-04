@@ -126,3 +126,5 @@ Vos emails Resend seront envoyés depuis `noreply@anireserve.com` et vos emails 
 
 **Résumé :** Ajoutez simplement les 3 enregistrements Resend dans Hostinger. Ils coexisteront avec vos enregistrements existants sans problème ! 🎯
 
+
+

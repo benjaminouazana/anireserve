@@ -34,36 +34,29 @@ export default function MyBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [emailSearch, setEmailSearch] = useState("");
+  const [searching, setSearching] = useState(false);
+
   useEffect(() => {
     async function loadClientAndBookings() {
       try {
         // Vérifier si le client est connecté
         const clientRes = await fetch("/api/client/me");
-        if (!clientRes.ok) {
-          // Pas connecté, rediriger vers login
-          router.push("/client/login");
-          return;
-        }
-
-        const clientData = await clientRes.json();
-        setClient(clientData);
-
-        // Charger les réservations
-        const bookingsRes = await fetch(`/api/bookings?email=${encodeURIComponent(clientData.email)}`, {
-          credentials: "include",
-        });
-        if (bookingsRes.ok) {
-          const bookingsData = await bookingsRes.json();
-          // L'API peut retourner un tableau directement ou un objet avec bookings
-          const bookingsArray = Array.isArray(bookingsData) ? bookingsData : (bookingsData.bookings || []);
-          setBookings(bookingsArray);
+        if (clientRes.ok) {
+          const clientData = await clientRes.json();
+          setClient(clientData);
+          setEmailSearch(clientData.email); // Pré-remplir avec l'email du client connecté
+          
+          // Charger les réservations automatiquement si connecté
+          await loadBookingsByEmail(clientData.email);
         } else {
-          console.error("Erreur chargement réservations:", bookingsRes.status);
-          setBookings([]);
+          // Pas connecté, on laisse l'utilisateur chercher par email
+          setClient(null);
         }
       } catch (err: unknown) {
         const error = err instanceof Error ? err : new Error(String(err));
-        setError(error.message || "Erreur lors du chargement");
+        console.error("Erreur chargement client:", error.message);
+        setClient(null);
       } finally {
         setLoading(false);
       }
@@ -71,6 +64,47 @@ export default function MyBookingsPage() {
 
     loadClientAndBookings();
   }, [router]);
+
+  async function loadBookingsByEmail(email: string) {
+    if (!email || !email.includes("@")) {
+      setError("Veuillez entrer une adresse email valide");
+      return;
+    }
+
+    setSearching(true);
+    setError(null);
+
+    try {
+      const bookingsRes = await fetch(`/api/bookings?email=${encodeURIComponent(email)}`, {
+        credentials: "include",
+      });
+      
+      if (bookingsRes.ok) {
+        const bookingsData = await bookingsRes.json();
+        const bookingsArray = Array.isArray(bookingsData) ? bookingsData : (bookingsData.bookings || []);
+        setBookings(bookingsArray);
+        
+        if (bookingsArray.length === 0) {
+          setError("Aucune réservation trouvée pour cet email.");
+        }
+      } else {
+        const errorData = await bookingsRes.json().catch(() => ({}));
+        setError(errorData.error || "Erreur lors du chargement des réservations");
+        setBookings([]);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Erreur lors du chargement");
+      setBookings([]);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  async function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    await loadBookingsByEmail(emailSearch);
+  }
 
   function getStatusBadge(status: string) {
     const statusConfig = {
@@ -116,7 +150,7 @@ export default function MyBookingsPage() {
     });
   }
 
-  if (loading) {
+  if (loading && !emailSearch) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-zinc-500">Chargement...</p>
@@ -154,22 +188,69 @@ export default function MyBookingsPage() {
             <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">
               Mes réservations
             </h1>
-            {client && (
+            {client ? (
               <p className="mt-2 text-sm text-zinc-500">
                 Bonjour {client.name} · {bookings.length} réservation{bookings.length > 1 ? "s" : ""}
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-zinc-500">
+                Entrez votre email pour voir vos réservations
               </p>
             )}
           </div>
 
+          {!client && (
+            <form onSubmit={handleSearch} className="mb-6">
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={emailSearch}
+                  onChange={(e) => setEmailSearch(e.target.value)}
+                  placeholder="votre@email.com"
+                  required
+                  className="flex-1 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm shadow-sm outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
+                />
+                <button
+                  type="submit"
+                  disabled={searching}
+                  className="rounded-xl bg-zinc-900 px-6 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {searching ? "Recherche..." : "Rechercher"}
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-zinc-500">
+                💡 <Link href="/client/login" className="text-zinc-900 hover:underline">Connectez-vous</Link> pour accéder automatiquement à vos réservations
+              </p>
+            </form>
+          )}
+
           {error && (
-            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className={`mb-6 rounded-xl border px-4 py-3 text-sm ${
+              error.includes("Aucune") 
+                ? "border-amber-200 bg-amber-50 text-amber-700"
+                : "border-red-200 bg-red-50 text-red-700"
+            }`}>
               {error}
             </div>
           )}
 
-          {bookings.length === 0 && !loading && (
+          {bookings.length === 0 && !loading && !searching && (client || emailSearch) && (
             <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6 text-sm text-zinc-500">
               Aucune réservation pour le moment.
+            </div>
+          )}
+
+          {!client && !emailSearch && !loading && (
+            <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6 text-center">
+              <p className="text-sm text-zinc-500 mb-4">
+                Entrez votre email ci-dessus pour voir vos réservations
+              </p>
+              <Link
+                href="/client/login"
+                className="inline-block rounded-xl bg-zinc-900 px-6 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
+              >
+                Se connecter
+              </Link>
             </div>
           )}
 

@@ -89,3 +89,5 @@ Consultez `GUIDE_GESTION_DOMAINES_RESEND.md` pour :
 
 **Note :** La clé API Resend est déjà configurée dans `apps/web/src/lib/resend-config.ts` avec la valeur : `re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx`
 
+
+

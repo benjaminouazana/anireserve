@@ -20,7 +20,9 @@
     "open:android": "npx cap open android",
     "setup:capacitor": "bash scripts/setup-capacitor.sh",
     "generate:icons": "bash scripts/generate-icons.sh",
-    "manage:domains": "node scripts/manage-resend-domains.js"
+    "manage:domains": "node scripts/manage-resend-domains.js",
+    "check:domain": "bash scripts/check-domain-status.sh",
+    "test:emails": "node scripts/test-emails.js"
   },
   "workspaces": [
     "apps/*"

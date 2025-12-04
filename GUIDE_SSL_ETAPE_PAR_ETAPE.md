@@ -294,3 +294,5 @@ Votre site est maintenant accessible en HTTPS avec un certificat SSL valide et r
 
 **Note** : Les certificats Let's Encrypt sont valides 90 jours et se renouvellent automatiquement tous les 60 jours.
 
+
+

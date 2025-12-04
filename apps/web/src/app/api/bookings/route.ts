@@ -59,12 +59,34 @@ export async function POST(req: Request) {
       );
     }
 
+    // Vérifier si l'email appartient à un professionnel
+    // Si oui, permettre au professionnel de réserver en tant que client
+    const professionalAsClient = await prisma.professional.findUnique({
+      where: { email: clientEmail },
+      select: { id: true, name: true },
+    });
+
+    // Empêcher un professionnel de réserver avec lui-même
+    if (professionalAsClient && professionalAsClient.id === professionalId) {
+      return NextResponse.json(
+        { error: "Vous ne pouvez pas réserver avec vous-même" },
+        { status: 400 }
+      );
+    }
+
     // Upsert du client (sans mot de passe si nouveau, pour compatibilité)
+    // Si c'est un professionnel qui réserve, utiliser ses infos du compte pro
+    const clientNameToUse = professionalAsClient ? professionalAsClient.name : clientName;
+    
     const client = await prisma.client.upsert({
       where: { email: clientEmail },
-      update: { name: clientName },
+      update: { 
+        name: clientNameToUse,
+        // Si c'est un professionnel, on peut aussi mettre à jour les autres infos
+        ...(professionalAsClient ? {} : { name: clientName }),
+      },
       create: { 
-        name: clientName, 
+        name: clientNameToUse, 
         email: clientEmail,
         password: null, // Pas de mot de passe par défaut, l'utilisateur peut s'inscrire plus tard
       },

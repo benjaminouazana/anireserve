@@ -294,3 +294,5 @@ Resend utilise la syntaxe `{{variable}}` pour les variables de template.
 
 **Pour les autres templates** (réservations, rappels, etc.), utilisez le même format avec les variables appropriées. Les templates sont dans `apps/web/src/lib/email-templates.ts` - vous pouvez extraire le HTML de chaque fonction.
 
+
+

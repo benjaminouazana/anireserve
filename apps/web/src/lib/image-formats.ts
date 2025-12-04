@@ -61,3 +61,5 @@ export function isMimeTypeSupported(mimeType: string): boolean {
   return ALLOWED_MIME_TYPES.includes(mimeType) || mimeType.startsWith("image/");
 }
 
+
+

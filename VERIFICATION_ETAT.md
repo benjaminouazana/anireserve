@@ -113,3 +113,5 @@ ls -la
 Exécutez les commandes de vérification ci-dessus et dites-moi ce que vous voyez. Ensuite, je vous guiderai pour la suite !
 
 
+
+

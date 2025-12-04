@@ -420,3 +420,5 @@ npx cap open android
 
 **Note** : Le processus de révision peut prendre 1-7 jours pour Apple et quelques heures à 3 jours pour Google.
 
+
+

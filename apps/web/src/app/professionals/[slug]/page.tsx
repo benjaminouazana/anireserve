@@ -6,6 +6,8 @@ import { ProfileHeader } from "./ProfileHeader";
 import { CalendarView } from "./CalendarView";
 import { Gallery } from "./Gallery";
 import { EditButtons } from "./EditButtons";
+import { ContactButton } from "./ContactButton";
+import { NotesSection } from "./NotesSection";
 import { generateMetadata } from "./metadata";
 import { generateSlug } from "@/lib/slug";
 
@@ -104,9 +106,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
         {/* Informations de contact */}
         <div className="border-b border-zinc-200 bg-white px-4 py-6 sm:px-8">
-          <h2 className="mb-4 text-lg font-semibold text-zinc-900">
-            Informations
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-zinc-900">
+              Informations
+            </h2>
+            <ContactButton
+              professionalId={professional.id}
+              professionalName={professional.name}
+              professionalEmail={professional.email}
+            />
+          </div>
           <div className="space-y-3 text-sm">
             <div>
               <span className="font-medium text-zinc-700">Villes :</span>
@@ -169,6 +178,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <CalendarView professionalId={professional.id} />
         </div>
 
+        {/* Section des notes privées (pour les clients) */}
+        <NotesSection professionalId={professional.id} />
+
         {/* Section des avis */}
         <ReviewsSection
           professionalId={professional.id}
@@ -176,14 +188,21 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           averageRating={averageRating}
         />
 
-        {/* Bouton de réservation */}
+        {/* Boutons d'action */}
         <div className="sticky bottom-0 border-t border-zinc-200 bg-white px-4 py-4 sm:px-8">
-          <Link
-            href={`/?proSlug=${professional.slug || generateSlug(professional.name)}`}
-            className="flex w-full items-center justify-center rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
-          >
-            Réserver un rendez-vous
-          </Link>
+          <div className="flex gap-3">
+            <ContactButton
+              professionalId={professional.id}
+              professionalName={professional.name}
+              professionalEmail={professional.email}
+            />
+            <Link
+              href={`/?proSlug=${professional.slug || generateSlug(professional.name)}`}
+              className="flex flex-1 items-center justify-center rounded-full bg-zinc-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
+            >
+              Réserver un rendez-vous
+            </Link>
+          </div>
         </div>
       </div>
     </div>

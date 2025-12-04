@@ -61,3 +61,5 @@ Si la recherche DNS inversée montre `2a02:4780:28:a1a4::1`, c'est probablement 
 
 **Note** : Pour la plupart des sites, l'enregistrement A (IPv4) est suffisant. L'AAAA est un bonus pour les utilisateurs avec IPv6.
 
+
+

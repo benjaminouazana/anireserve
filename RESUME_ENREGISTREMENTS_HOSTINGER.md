@@ -66,3 +66,5 @@ Une fois vérifié, vos emails Resend partiront de `noreply@anireserve.com` et v
 
 **C'est tout !** Ajoutez simplement ces 3 enregistrements dans Hostinger. 🚀
 
+
+

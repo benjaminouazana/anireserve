@@ -99,3 +99,5 @@ Si vous ne trouvez pas l'option pour désactiver le proxy :
 
 **Note** : Le proxy Hostinger est souvent activé par défaut pour améliorer les performances, mais il interfère avec votre configuration VPS personnalisée.
 
+
+

@@ -190,3 +190,5 @@ sudo systemctl reload nginx
 
 **Note** : Si le problème persiste après ces vérifications, partagez les logs PM2 et Nginx pour un diagnostic plus approfondi.
 
+
+

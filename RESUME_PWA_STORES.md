@@ -154,3 +154,5 @@ npm run open:android
 
 **Status** : ✅ **Configuration complète et prête pour publication !**
 
+
+

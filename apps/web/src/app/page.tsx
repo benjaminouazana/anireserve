@@ -158,20 +158,30 @@ function HomeContent() {
   useEffect(() => {
     loadDefaultProfessionals();
     
-    // Charger les infos du client connecté pour préremplir le formulaire
-    async function loadClientInfo() {
+    // Charger les infos du client ou du professionnel connecté pour préremplir le formulaire
+    async function loadUserInfo() {
       try {
+        // Essayer d'abord comme client
         const clientRes = await fetch("/api/client/me", { credentials: "include" });
         if (clientRes.ok) {
           const client = await clientRes.json();
           setClientName(client.name || "");
           setClientEmail(client.email || "");
+          return;
+        }
+        
+        // Si pas client, essayer comme professionnel (un pro peut réserver avec un autre pro)
+        const proRes = await fetch("/api/pro/me", { credentials: "include" });
+        if (proRes.ok) {
+          const pro = await proRes.json();
+          setClientName(pro.name || "");
+          setClientEmail(pro.email || "");
         }
       } catch (error) {
-        // Pas de client connecté, on laisse vide
+        // Pas connecté, on laisse vide
       }
     }
-    loadClientInfo();
+    loadUserInfo();
   }, []);
 
   // Gérer proSlug dans l'URL après le chargement des pros

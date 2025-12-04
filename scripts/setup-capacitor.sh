@@ -41,3 +41,5 @@ echo "  3. Synchroniser : npx cap sync"
 echo "  4. Ouvrir dans Xcode : npx cap open ios"
 echo "  5. Ouvrir dans Android Studio : npx cap open android"
 
+
+

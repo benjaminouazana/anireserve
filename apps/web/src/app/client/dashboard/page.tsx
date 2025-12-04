@@ -168,7 +168,15 @@ export default function ClientDashboardPage() {
           >
             ← Retour à l'accueil
           </Link>
-          <ClientLogoutButton />
+          <div className="flex gap-2">
+            <Link
+              href="/client/settings"
+              className="inline-flex items-center rounded-full border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50"
+            >
+              ⚙️ Paramètres
+            </Link>
+            <ClientLogoutButton />
+          </div>
         </div>
 
         <div className="mb-8">
