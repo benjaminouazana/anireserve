@@ -3,8 +3,15 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { generateUniqueSlug } from "@/lib/slug";
 import { sendNewProfessionalNotificationToAdmin, sendProfessionalRegistrationConfirmation } from "@/lib/email";
+import { rateLimit, registerLimiter } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  // Rate limiting: 3 inscriptions par heure
+  const rateLimitResult = await rateLimit(req, registerLimiter);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const {
       firstName,

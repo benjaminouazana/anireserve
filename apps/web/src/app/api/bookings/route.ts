@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import {
+  sendBookingRequestEmailToClient,
+  sendBookingRequestEmailToPro,
+} from "@/lib/email";
+import { rateLimit, bookingLimiter } from "@/lib/rate-limit";
 
+// Créer une réservation
 export async function POST(req: Request) {
+  // Rate limiting: 10 réservations par minute
+  const rateLimitResult = await rateLimit(req, bookingLimiter);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const { professionalId, clientName, clientEmail, date, startTime, endTime } =
       await req.json();
@@ -77,16 +89,16 @@ export async function POST(req: Request) {
     // Upsert du client (sans mot de passe si nouveau, pour compatibilité)
     // Si c'est un professionnel qui réserve, utiliser ses infos du compte pro
     const clientNameToUse = professionalAsClient ? professionalAsClient.name : clientName;
-    
+
     const client = await prisma.client.upsert({
       where: { email: clientEmail },
-      update: { 
+      update: {
         name: clientNameToUse,
         // Si c'est un professionnel, on peut aussi mettre à jour les autres infos
         ...(professionalAsClient ? {} : { name: clientName }),
       },
-      create: { 
-        name: clientNameToUse, 
+      create: {
+        name: clientNameToUse,
         email: clientEmail,
         password: null, // Pas de mot de passe par défaut, l'utilisateur peut s'inscrire plus tard
       },

@@ -2,8 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
+import { rateLimit, loginLimiter } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  // Rate limiting: 5 tentatives par 15 minutes
+  const rateLimitResult = await rateLimit(req, loginLimiter);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const { email, password } = await req.json();
 

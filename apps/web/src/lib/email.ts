@@ -1,5 +1,11 @@
 import { Resend } from "resend";
-import * as emailTemplates from "./email-templates";
+import {
+  templateNewProfessionalAdmin as newProfessionalAdmin,
+  templateProfessionalRegistrationConfirmation as professionalRegistrationConfirmation,
+  templateProfessionalValidated as professionalValidated,
+  templateProfessionalRejected as professionalRejected
+} from "./email-templates";
+
 
 // Initialiser Resend (utilise la variable d'environnement RESEND_API_KEY ou la clé par défaut)
 const resend = new Resend(process.env.RESEND_API_KEY || "re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx");
@@ -399,7 +405,7 @@ async function sendEmailWithTemplate(
     }
 
     const template = templateFn(templateData);
-    
+
     await resend.emails.send({
       from,
       to,
@@ -425,7 +431,7 @@ export async function sendNewProfessionalNotificationToAdmin(
 ) {
   return sendEmailWithTemplate(
     "admin@anireserve.com",
-    emailTemplates.newProfessionalAdmin,
+    newProfessionalAdmin,
     { professionalName, email, phone, city, serviceType, description }
   );
 }
@@ -437,7 +443,7 @@ export async function sendProfessionalRegistrationConfirmation(
 ) {
   return sendEmailWithTemplate(
     to,
-    emailTemplates.professionalRegistrationConfirmation,
+    professionalRegistrationConfirmation,
     { professionalName }
   );
 }
@@ -449,7 +455,7 @@ export async function sendProfessionalValidated(
 ) {
   return sendEmailWithTemplate(
     to,
-    emailTemplates.professionalValidated,
+    professionalValidated,
     { professionalName }
   );
 }
@@ -462,7 +468,7 @@ export async function sendProfessionalRejected(
 ) {
   return sendEmailWithTemplate(
     to,
-    emailTemplates.professionalRejected,
+    professionalRejected,
     { professionalName, reason }
   );
 }
@@ -484,10 +490,10 @@ export async function sendBookingStatusChangeEmail(
     }
 
     const isConfirmed = status === "confirmed";
-    const subject = isConfirmed 
+    const subject = isConfirmed
       ? `✅ Réservation confirmée avec ${professionalName}`
       : `❌ Réservation annulée avec ${professionalName}`;
-    
+
     const title = isConfirmed ? "✅ Réservation confirmée !" : "❌ Réservation annulée";
     const color = isConfirmed ? "#10b981" : "#ef4444";
     const bgColor = isConfirmed ? "#ecfdf5" : "#fef2f2";

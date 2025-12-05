@@ -8,14 +8,19 @@ const globalForPrisma = globalThis as unknown as {
 const getDatabaseUrl = () => {
   const url = process.env.DATABASE_URL;
   if (!url) {
+    // En mode build, on peut ne pas avoir de DATABASE_URL
+    if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
+      console.warn("⚠️ DATABASE_URL n'est pas défini - utilisation d'une URL par défaut pour le build");
+      return "postgresql://user:password@localhost:5432/anireserve?connection_limit=10&pool_timeout=20&connect_timeout=10";
+    }
     throw new Error("DATABASE_URL n'est pas défini");
   }
-  
+
   // Si l'URL contient déjà des paramètres, les préserver
   if (url.includes("?")) {
     return url;
   }
-  
+
   // Ajouter des paramètres pour gérer les connexions fermées
   // connection_limit: nombre max de connexions dans le pool
   // pool_timeout: timeout pour obtenir une connexion du pool
@@ -42,7 +47,7 @@ export async function withReconnect<T>(
     return await operation();
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     // Si la connexion est fermée, tenter de reconnecter
     if (errorMessage.includes("Closed") || errorMessage.includes("connection")) {
       console.warn("⚠️ Connexion fermée, tentative de reconnexion...");

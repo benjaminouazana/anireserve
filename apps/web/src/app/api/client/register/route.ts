@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { rateLimit, registerLimiter } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  // Rate limiting: 3 inscriptions par heure
+  const rateLimitResult = await rateLimit(req, registerLimiter);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const { name, email, password } = await req.json();
 

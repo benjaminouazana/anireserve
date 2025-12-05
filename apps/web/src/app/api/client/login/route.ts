@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { loginClient } from "@/lib/auth";
+import { rateLimit, loginLimiter } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  // Rate limiting: 5 tentatives par 15 minutes
+  const rateLimitResult = await rateLimit(req, loginLimiter);
+  if (!rateLimitResult.success) {
+    return rateLimitResult.response;
+  }
+
   try {
     const { email, password } = await req.json();
 
@@ -38,6 +45,7 @@ export async function POST(req: Request) {
     );
   }
 }
+
 
 
 
