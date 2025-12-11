@@ -1,121 +1,82 @@
-# 🔧 Correction Erreur Client-Side
+# 🔧 Correction Erreur Client-Side - ToastProvider
 
-## 🐛 Problème
+**Erreur:** "Application error: a client-side exception has occurred"
 
-Erreur: "Application error: a client-side exception has occurred"
+## 🔍 Cause du Problème
+
+L'erreur était causée par :
+1. **ToastProvider.tsx était vide** (fichier supprimé ou vidé)
+2. **ToastProvider n'était pas dans le layout** principal
+3. **Beaucoup de composants utilisent `useToast()`** mais le provider n'existe pas
+4. **Erreur:** "useToast must be used within a ToastProvider"
 
 ## ✅ Corrections Appliquées
 
-### 1. ✅ Logo.tsx - Font Google dans composant client
+### 1. Recréation de ToastProvider.tsx
 
-**Problème:** Le composant Logo chargeait `Montserrat` depuis `next/font/google` alors que la font est déjà chargée dans le layout.
+Le fichier `apps/web/src/components/ToastProvider.tsx` a été recréé avec :
+- Contexte React pour gérer les toasts
+- Hook `useToast()` pour afficher des notifications
+- Gestion de l'état des toasts
+- Intégration avec le composant `Toast`
 
-**Correction:** Suppression de l'import et utilisation de la classe CSS `font-montserrat` directement.
+### 2. Ajout au Layout Principal
 
-**Fichier:** `apps/web/src/components/Logo.tsx`
+Le fichier `apps/web/src/app/layout.tsx` a été modifié pour :
+- Importer `ThemeProvider` et `ToastProvider`
+- Envelopper toute l'application avec ces providers
+- Corriger la langue (en → fr)
+- Améliorer les metadata
 
----
+## 📋 Structure Finale du Layout
 
-### 2. ✅ ThemeProvider - Accès localStorage/window
-
-**Problème:** Accès à `localStorage` et `window` sans vérification, pouvant causer des erreurs d'hydratation.
-
-**Corrections:**
-- Ajout de vérifications `typeof window !== "undefined"`
-- Try/catch autour des accès localStorage
-- Validation du thème avant de l'utiliser
-
-**Fichier:** `apps/web/src/app/ThemeProvider.tsx`
-
----
-
-### 3. ✅ page.tsx - Vérification window
-
-**Problème:** `useEffect` peut s'exécuter côté serveur.
-
-**Correction:** Ajout de vérification `typeof window === "undefined"` au début du useEffect.
-
-**Fichier:** `apps/web/src/app/page.tsx`
-
----
-
-### 4. ✅ Error Boundary créé
-
-**Fichier créé:** `apps/web/src/app/error.tsx`
-
-Gestion d'erreur globale pour capturer et afficher les erreurs client-side de manière élégante.
-
----
-
-## 🔍 Vérifications
-
-### Vérifier que les corrections sont appliquées
-
-```bash
-# Vérifier Logo.tsx
-grep -n "Montserrat\|next/font" apps/web/src/components/Logo.tsx
-
-# Vérifier ThemeProvider
-grep -n "typeof window\|localStorage" apps/web/src/app/ThemeProvider.tsx
-
-# Vérifier page.tsx
-grep -n "typeof window" apps/web/src/app/page.tsx
+```tsx
+<ThemeProvider>
+  <ToastProvider>
+    {children}
+  </ToastProvider>
+</ThemeProvider>
 ```
 
----
+## 🚀 Déploiement de la Correction
 
-## 🚀 Actions Requises
+Sur le serveur, exécutez :
 
-### 1. Rebuild l'application
-
-```bash
-cd apps/web
-npm run build
-```
-
-### 2. Redémarrer le serveur
-
-**Sur le serveur:**
 ```bash
 cd /var/www/anireserve/apps/web
+
+# Récupérer les dernières modifications
+git pull
+
+# Rebuild (les fichiers ont changé)
 npm run build
+
+# Redémarrer PM2
 pm2 restart anireserve
+
+# Attendre 10 secondes
+sleep 10
+
+# Vérifier
+pm2 status
+pm2 logs anireserve --lines 10 --nostream
 ```
 
----
+## ✅ Résultat Attendu
 
-## 📋 Checklist
+Après le redéploiement :
+- ✅ Plus d'erreur "client-side exception"
+- ✅ Le site s'affiche correctement
+- ✅ Les toasts fonctionnent dans toute l'application
+- ✅ Le thème fonctionne correctement
 
-- [x] Logo.tsx corrigé (font)
-- [x] ThemeProvider corrigé (localStorage/window)
-- [x] page.tsx corrigé (vérification window)
-- [x] Error boundary créé
-- [ ] Application rebuildée
-- [ ] Serveur redémarré
-- [ ] Erreur testée
+## 🔍 Vérification
 
----
-
-## 🆘 Si l'erreur persiste
-
-1. **Vérifier la console du navigateur:**
-   - Ouvrir les DevTools (F12)
-   - Onglet Console
-   - Noter l'erreur exacte
-
-2. **Vérifier les logs serveur:**
-   ```bash
-   pm2 logs anireserve --lines 50
-   ```
-
-3. **Vérifier les variables d'environnement:**
-   ```bash
-   cd /var/www/anireserve/apps/web
-   cat .env | grep NEXT_PUBLIC
-   ```
+1. **Ouvrir le site** dans le navigateur
+2. **Ouvrir la console** (F12)
+3. **Vérifier qu'il n'y a plus d'erreurs** JavaScript
+4. **Tester une fonctionnalité** qui utilise les toasts
 
 ---
 
-**Date:** 7 décembre 2025  
-**Statut:** ✅ Corrections appliquées
-
+**Action requise:** Exécuter les commandes de déploiement sur le serveur pour appliquer la correction.
