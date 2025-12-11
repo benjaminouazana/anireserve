@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Pages de professionnels (dynamiques)
   try {
     // Vérifier que Prisma est disponible (pas en build si DATABASE_URL manque)
-    if (typeof window === "undefined" && process.env.DATABASE_URL) {
+    if (typeof window === "undefined" && process.env.DATABASE_URL && prisma) {
       const professionals = await prisma.professional.findMany({
         where: {
           status: "approved",
