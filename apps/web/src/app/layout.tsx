@@ -13,20 +13,90 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://anireserve.com'),
   title: {
-    default: "AniReserve - Réservation professionnels en Israël",
-    template: "%s | AniReserve",
+    default: "AniReserve - Réservation de Professionnels en Israël | Coiffeurs, Médecins, Esthétique",
+    template: "%s | AniReserve - Réservations Pros Israël",
   },
-  description: "Trouvez et réservez des professionnels en Israël. Coiffeurs, esthéticiennes, médecins. Plateforme simple pour les Français.",
-  keywords: ["réservation", "professionnels", "Israël", "français", "coiffeur", "esthétique", "médecin", "rendez-vous", "booking"],
-  authors: [{ name: "AniReserve" }],
+  description: "Trouvez et réservez facilement des professionnels francophones en Israël. Coiffeurs, médecins, dentistes, esthéticiennes, ostéopathes et plus. Disponibilités en temps réel, avis vérifiés, paiement sécurisé.",
+  keywords: [
+    // Services
+    "réservation professionnels israël",
+    "coiffeur israël français",
+    "médecin francophone israël",
+    "dentiste tel aviv",
+    "esthéticienne jérusalem",
+    "ostéopathe netanya",
+    "kinésithérapeute ashdod",
+    // Locations
+    "rendez-vous tel aviv",
+    "booking jérusalem",
+    "réservation netanya",
+    "professionnels haifa",
+    // Features
+    "réservation en ligne",
+    "prise de rendez-vous",
+    "plateforme réservation",
+    "communauté française israël",
+    "avis clients vérifiés"
+  ],
+  authors: [{ name: "AniReserve", url: "https://anireserve.com" }],
   creator: "AniReserve",
   publisher: "AniReserve",
+
+  // Open Graph
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: 'https://anireserve.com',
+    siteName: 'AniReserve',
+    title: 'AniReserve - Réservation de Professionnels en Israël',
+    description: 'Trouvez et réservez des professionnels francophones en Israël. Coiffeurs, médecins, dentistes et plus. Simple, rapide, sécurisé.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AniReserve - Plateforme de réservation',
+      }
+    ],
+  },
+
+  // Twitter Card
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AniReserve - Réservation Professionnels Israël',
+    description: 'Trouvez et réservez des professionnels francophones en Israël',
+    images: ['/og-image.jpg'],
+    creator: '@anireserve',
+  },
+
+  // Robots
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+
+  // Verification
+  verification: {
+    google: 'google-site-verification-code', // À remplacer
+    // yandex: 'yandex-verification',
+    // bing: 'bing-verification',
+  },
+
+  // Mobile
   viewport: {
     width: "device-width",
     initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+    maximumScale: 5,
+    userScalable: true,
     viewportFit: "cover",
   },
   themeColor: [
@@ -48,34 +118,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+
+
+  // Alternate languages (pour le futur)
   alternates: {
     canonical: "/",
   },
-  openGraph: {
-    type: "website",
-    locale: "fr_FR",
-    url: "/",
-    title: "AniReserve - La plateforme de réservation en Israël pour les Français",
-    description: "Trouvez et réservez facilement des professionnels en Israël. Plateforme de réservation simple et sécurisée.",
-    siteName: "AniReserve",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AniReserve - La plateforme de réservation en Israël",
-    description: "Trouvez et réservez facilement des professionnels en Israël.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
+
+  // Icons & Manifest
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -94,10 +144,8 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body
         className={`${montserrat.variable} font-montserrat antialiased flex flex-col`}
-        style={{ 
-          minHeight: "100vh",
+        style={{
           minHeight: "100dvh",
-          height: "100vh",
           height: "100dvh",
           position: "fixed",
           width: "100%",

@@ -10,9 +10,24 @@ export async function loginProfessional(email: string, password: string) {
     return null;
   }
 
-  // Comparaison simple pour l'instant (à remplacer par bcrypt plus tard)
-  // TODO: utiliser bcrypt.compare une fois bcryptjs installé
-  if (password !== professional.password) {
+  // Comparer le mot de passe avec bcrypt uniquement
+  // ⚠️ SÉCURITÉ: Les mots de passe en clair ne sont plus supportés
+  let isValid = false;
+  try {
+    const bcrypt = await import("bcryptjs");
+    // Vérifier que le mot de passe est hashé (commence par $2)
+    if (!professional.password.startsWith("$2")) {
+      console.error(`🔴 SÉCURITÉ: Mot de passe non hashé détecté pour le professionnel ${professional.email} - Connexion refusée. Migration requise.`);
+      return null;
+    }
+    // Comparer avec bcrypt
+    isValid = await bcrypt.compare(password, professional.password);
+  } catch (error) {
+    console.error("Erreur lors de la comparaison du mot de passe:", error);
+    return null;
+  }
+
+  if (!isValid) {
     return null;
   }
 
@@ -70,14 +85,21 @@ export async function loginClient(email: string, password: string) {
     return null;
   }
 
-  // Utiliser bcrypt si disponible, sinon comparaison simple pour compatibilité
+  // Comparer le mot de passe avec bcrypt uniquement
+  // ⚠️ SÉCURITÉ: Les mots de passe en clair ne sont plus supportés
   let isValid = false;
   try {
     const bcrypt = await import("bcryptjs");
+    // Vérifier que le mot de passe est hashé (commence par $2)
+    if (!client.password.startsWith("$2")) {
+      console.error(`🔴 SÉCURITÉ: Mot de passe non hashé détecté pour le client ${client.email} - Connexion refusée. Migration requise.`);
+      return null;
+    }
+    // Comparer avec bcrypt
     isValid = await bcrypt.compare(password, client.password);
-  } catch {
-    // Fallback si bcrypt n'est pas disponible
-    isValid = password === client.password;
+  } catch (error) {
+    console.error("Erreur lors de la comparaison du mot de passe:", error);
+    return null;
   }
 
   if (!isValid) {
@@ -137,14 +159,21 @@ export async function loginAdmin(email: string, password: string) {
       return null;
     }
 
-  // Utiliser bcrypt si disponible
+  // Comparer le mot de passe avec bcrypt uniquement
+  // ⚠️ SÉCURITÉ: Les mots de passe en clair ne sont plus supportés
   let isValid = false;
   try {
     const bcrypt = await import("bcryptjs");
+    // Vérifier que le mot de passe est hashé (commence par $2)
+    if (!admin.password.startsWith("$2")) {
+      console.error(`🔴 SÉCURITÉ: Mot de passe non hashé détecté pour l'admin ${admin.email} - Connexion refusée. Migration requise.`);
+      return null;
+    }
+    // Comparer avec bcrypt
     isValid = await bcrypt.compare(password, admin.password);
-  } catch {
-    // Fallback si bcrypt n'est pas disponible
-    isValid = password === admin.password;
+  } catch (error) {
+    console.error("Erreur lors de la comparaison du mot de passe:", error);
+    return null;
   }
 
   if (!isValid) {

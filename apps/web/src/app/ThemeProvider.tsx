@@ -18,18 +18,27 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem("theme") as Theme;
-    if (saved) {
-      setTheme(saved);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
+    try {
+      const saved = localStorage.getItem("theme") as Theme;
+      if (saved && (saved === "light" || saved === "dark")) {
+        setTheme(saved);
+      } else if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setTheme("dark");
+      }
+    } catch (error) {
+      console.warn("Erreur lors du chargement du thème:", error);
+      // Utiliser le thème par défaut en cas d'erreur
     }
   }, []);
 
   useEffect(() => {
-    if (mounted) {
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      localStorage.setItem("theme", theme);
+    if (mounted && typeof document !== "undefined") {
+      try {
+        document.documentElement.classList.toggle("dark", theme === "dark");
+        localStorage.setItem("theme", theme);
+      } catch (error) {
+        console.warn("Erreur lors de la sauvegarde du thème:", error);
+      }
     }
   }, [theme, mounted]);
 
@@ -51,6 +60,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
+
+
+
 
 
 

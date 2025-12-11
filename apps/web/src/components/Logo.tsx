@@ -1,16 +1,8 @@
 "use client";
 
-import { Montserrat } from "next/font/google";
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
-  variable: "--font-montserrat",
-});
-
 export function Logo({ className = "", width = 300, height = 120, showTagline = false }: { className?: string; width?: number; height?: number; showTagline?: boolean }) {
   return (
-    <div className={`${montserrat.variable} font-montserrat ${className}`} style={{ width, height }}>
+    <div className={`font-montserrat ${className}`} style={{ width, height }}>
       <div className="flex items-center gap-3">
         {/* Ampoule */}
         <div className="relative">
@@ -53,7 +45,7 @@ export function Logo({ className = "", width = 300, height = 120, showTagline = 
 // Version simplifiée pour les petits espaces
 export function LogoCompact({ className = "", width = 150, height = 60 }: { className?: string; width?: number; height?: number }) {
   return (
-    <div className={`${montserrat.variable} font-montserrat flex items-center gap-2 ${className}`} style={{ width, height }}>
+    <div className={`font-montserrat flex items-center gap-2 ${className}`} style={{ width, height }}>
       {/* Ampoule miniature */}
       <div className="relative">
         <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-400"></div>

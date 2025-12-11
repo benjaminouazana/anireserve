@@ -204,8 +204,9 @@ export async function GET(req: Request) {
         hasMore: page * limit < totalCount,
       },
     });
-    // Cache pour 30 secondes (les données changent peu souvent)
-    response.headers.set("Cache-Control", "public, s-maxage=30, stale-while-revalidate=60");
+    // Cache optimisé: 60 secondes pour les résultats de recherche
+    // stale-while-revalidate permet de servir du contenu périmé pendant la mise à jour
+    response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
     return response;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";

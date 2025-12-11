@@ -49,14 +49,30 @@ export async function POST(req: Request) {
     }
 
     // Comparer le mot de passe avec bcrypt
-    // Support pour les anciens mots de passe en clair (migration progressive)
+    // ⚠️ SÉCURITÉ: Support temporaire pour les anciens mots de passe en clair (migration progressive)
+    // TODO: Supprimer ce fallback après migration complète de tous les mots de passe
     let isValid = false;
     if (professional.password.startsWith("$2")) {
       // Mot de passe hashé avec bcrypt
       isValid = await bcrypt.compare(password, professional.password);
     } else {
-      // Ancien mot de passe en clair (pour migration)
+      // Ancien mot de passe en clair (pour migration - À SUPPRIMER après migration complète)
+      console.warn(`⚠️ SÉCURITÉ: Mot de passe en clair détecté pour le professionnel ${professional.email} - Migration requise`);
       isValid = password === professional.password;
+      
+      // Auto-migration: hasher le mot de passe lors de la prochaine connexion réussie
+      if (isValid) {
+        try {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          await prisma.professional.update({
+            where: { id: professional.id },
+            data: { password: hashedPassword },
+          });
+          console.log(`✅ Mot de passe migré avec succès pour ${professional.email}`);
+        } catch (migrationError) {
+          console.error(`❌ Erreur lors de la migration du mot de passe pour ${professional.email}:`, migrationError);
+        }
+      }
     }
 
     if (!isValid) {

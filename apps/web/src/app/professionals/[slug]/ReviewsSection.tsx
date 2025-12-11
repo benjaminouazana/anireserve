@@ -84,8 +84,18 @@ export function ReviewsSection({
     });
   }
 
-  function handleReviewAdded(newReview: Review) {
-    setReviews([newReview, ...reviews]);
+  function handleReviewAdded(newReview: any) {
+    // Convertir le Review de l'API en Review local avec client
+    const localReview: Review = {
+      id: newReview.id,
+      rating: newReview.rating,
+      comment: newReview.comment,
+      createdAt: newReview.createdAt,
+      client: {
+        name: newReview.client?.name || "Client anonyme",
+      },
+    };
+    setReviews([localReview, ...reviews]);
     setShowReviewForm(false);
     setCanReview({ canReview: false, reason: "already_reviewed", bookingId: null });
   }

@@ -156,6 +156,9 @@ function HomeContent() {
 
   // Charger des pros par défaut au chargement et gérer proSlug dans l'URL
   useEffect(() => {
+    // Vérifier que nous sommes côté client
+    if (typeof window === "undefined") return;
+    
     loadDefaultProfessionals();
     
     // Charger les infos du client ou du professionnel connecté pour préremplir le formulaire
@@ -178,7 +181,8 @@ function HomeContent() {
           setClientEmail(pro.email || "");
         }
       } catch (error) {
-        // Pas connecté, on laisse vide
+        // Pas connecté, on laisse vide - ne pas logger l'erreur pour éviter le spam
+        console.debug("Utilisateur non connecté");
       }
     }
     loadUserInfo();

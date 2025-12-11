@@ -7,8 +7,12 @@ import {
 } from "./email-templates";
 
 
-// Initialiser Resend (utilise la variable d'environnement RESEND_API_KEY ou la clé par défaut)
-const resend = new Resend(process.env.RESEND_API_KEY || "re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx");
+// Initialiser Resend (utilise uniquement la variable d'environnement RESEND_API_KEY)
+// ⚠️ SÉCURITÉ: Ne jamais mettre de clé API en dur dans le code
+if (!process.env.RESEND_API_KEY) {
+  console.warn("⚠️ RESEND_API_KEY n'est pas définie - Les emails ne pourront pas être envoyés");
+}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email pour le client : demande de réservation créée (en attente)
 export async function sendBookingRequestEmailToClient(

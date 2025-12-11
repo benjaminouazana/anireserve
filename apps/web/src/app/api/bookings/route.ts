@@ -224,7 +224,10 @@ export async function GET(req: Request) {
       status: booking.status,
     }));
 
-    return NextResponse.json(bookings);
+    const response = NextResponse.json(bookings);
+    // Cache pour 30 secondes (les réservations changent peu souvent)
+    response.headers.set("Cache-Control", "private, s-maxage=30, stale-while-revalidate=60");
+    return response;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
     console.error("Erreur API /api/bookings:", errorMessage);

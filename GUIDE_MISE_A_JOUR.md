@@ -294,3 +294,6 @@ Si tu rencontres un problème :
 3. Vérifie Nginx : `sudo nginx -t`
 4. Consulte les fichiers de documentation dans le projet
 
+
+
+

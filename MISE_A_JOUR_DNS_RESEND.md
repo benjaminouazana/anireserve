@@ -104,3 +104,6 @@ Le statut devrait passer à `"verified"` une fois les DNS correctement mis à jo
 **Une fois les DNS mis à jour et vérifiés, vos emails seront automatiquement envoyés depuis `noreply@anireserve.com` !** 🎉
 
 
+
+
+

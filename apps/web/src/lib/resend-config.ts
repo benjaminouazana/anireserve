@@ -1,7 +1,12 @@
 import { Resend } from 'resend';
 
 // Configuration Resend avec votre clé API
-const resend = new Resend('re_YaufuMTW_LVJ8N4CdbffuSEVU6B1EYMrx');
+// ⚠️ SÉCURITÉ: Ne jamais mettre de clé API en dur dans le code
+// Utilise uniquement la variable d'environnement RESEND_API_KEY
+if (!process.env.RESEND_API_KEY) {
+  console.warn("⚠️ RESEND_API_KEY n'est pas définie - Les emails ne pourront pas être envoyés");
+}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Configuration du domaine (à faire une seule fois)
 export async function setupResendDomain() {
@@ -25,6 +30,9 @@ export { resend };
 
 // Pour utiliser dans d'autres fichiers :
 // import { resend } from '@/lib/resend-config';
+
+
+
 
 
 

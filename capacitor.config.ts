@@ -3,26 +3,23 @@ import { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.anireserve.app',
   appName: 'AniReserve',
-  webDir: 'apps/web/out', // Point vers le build statique (next export)
+  webDir: 'apps/web/out',
   server: {
-    // Pour le développement, commenter url pour utiliser l'app en local
-    // Pour la production, décommenter et mettre l'URL de prod
-    // url: 'https://anireserve.com',
+    url: 'https://anireserve.com',  // Backend production HTTPS
+    cleartext: false,     // false pour HTTPS
     androidScheme: 'https',
     iosScheme: 'https',
-    hostname: 'localhost', // Pour dev local
-    cleartext: true, // Permettre HTTP en dev
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
       launchAutoHide: true,
-      backgroundColor: '#18223b', // Couleur principale
+      backgroundColor: '#18223b',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
       showSpinner: true,
       iosSpinnerStyle: 'large',
-      spinnerColor: '#2FB190', // Couleur accent
+      spinnerColor: '#2FB190',
     },
     StatusBar: {
       style: 'dark',
@@ -41,18 +38,17 @@ const config: CapacitorConfig = {
     },
     allowMixedContent: false,
     captureInput: true,
-    webContentsDebuggingEnabled: true, // Activer pour debug
+    webContentsDebuggingEnabled: true,
   },
   ios: {
     contentInset: 'automatic',
     scrollEnabled: true,
     preferredContentMode: 'mobile',
-    scheme: 'AniReserve', // Scheme personnalisé pour iOS
+    scheme: 'AniReserve',
   },
 };
 
 export default config;
-
 
 
 
