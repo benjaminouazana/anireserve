@@ -73,5 +73,3 @@ export async function withReconnect<T>(
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
-
-

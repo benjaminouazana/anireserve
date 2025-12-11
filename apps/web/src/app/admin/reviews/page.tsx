@@ -13,16 +13,3 @@ export default async function AdminReviewsPage() {
 
   return <AdminReviewsContent admin={admin} />;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

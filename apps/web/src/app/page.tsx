@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { CITIES, SERVICES, SERVICE_SUBCATEGORIES } from "@/app/pro/register/constants";
 import { useToast } from "@/components/ToastProvider";
 import { Logo } from "@/components/Logo";
-import { generateSlug } from "@/lib/slug-utils";
+import { generateSlug } from "@/lib/slug";
 import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
@@ -39,7 +39,14 @@ const FALLBACK_PROS: Professional[] = [
 
 function HomeContent() {
   const toast = useToast();
-  const searchParams = useSearchParams();
+  let searchParams;
+  try {
+    searchParams = useSearchParams();
+  } catch (error) {
+    console.error("Erreur useSearchParams:", error);
+    // Fallback si useSearchParams échoue
+    searchParams = null;
+  }
   const [city, setCity] = useState("");
   const [service, setService] = useState("");
   const [subcategory, setSubcategory] = useState("");
