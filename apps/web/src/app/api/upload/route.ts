@@ -65,10 +65,9 @@ export async function POST(req: Request) {
     console.error("Erreur upload:", errorMessage);
     return NextResponse.json(
       { error: errorMessage || "Erreur lors de l'upload" },
-      { status: 500       }
+      { status: 500 }
     );
   }
-  });
 }
 
 
