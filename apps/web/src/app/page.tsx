@@ -39,14 +39,7 @@ const FALLBACK_PROS: Professional[] = [
 
 function HomeContent() {
   const toast = useToast();
-  let searchParams;
-  try {
-    searchParams = useSearchParams();
-  } catch (error) {
-    console.error("Erreur useSearchParams:", error);
-    // Fallback si useSearchParams échoue
-    searchParams = null;
-  }
+  const searchParams = useSearchParams();
   const [city, setCity] = useState("");
   const [service, setService] = useState("");
   const [subcategory, setSubcategory] = useState("");
