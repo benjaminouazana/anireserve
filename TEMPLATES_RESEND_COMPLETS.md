@@ -299,3 +299,5 @@ Resend utilise la syntaxe `{{variable}}` pour les variables de template.
 
 
 
+
+

@@ -1,0 +1,26 @@
+# AniReserve SEO & Marketing
+
+## Robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /pro/dashboard
+Disallow: /client/settings
+
+# Sitemap
+Sitemap: https://anireserve.com/sitemap.xml
+
+# Search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
