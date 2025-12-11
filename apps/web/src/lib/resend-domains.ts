@@ -1,4 +1,4 @@
-import { resend } from './resend-config';
+import { getResend } from './resend-config';
 
 /**
  * Utilitaire de gestion des domaines Resend
@@ -12,6 +12,10 @@ import { resend } from './resend-config';
  */
 export async function listDomains() {
   try {
+    const resend = getResend();
+    if (!resend) {
+      throw new Error("Resend n'est pas configuré. RESEND_API_KEY est manquante.");
+    }
     const domains = await resend.domains.list();
     console.log('📋 Domaines disponibles:', domains);
     return domains;
