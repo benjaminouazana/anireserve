@@ -1,63 +1,105 @@
-# 🚀 Déploiement Rapide - AniReserve
+# 🚀 Guide de Déploiement Rapide
 
-## ⚡ Méthode la Plus Simple
+## Solution pour éviter les rebuilds répétés
 
-### 1. Double-clique sur le fichier `deploy.sh`
+### ✅ Build une seule fois, redémarre plusieurs fois
 
-Ou depuis le terminal :
+Au lieu de rebuilder à chaque fois, vous pouvez :
 
+1. **Faire le build UNE FOIS** quand tout est prêt
+2. **Redémarrer PM2** pour appliquer les changements de code (si pas de changement de structure)
+
+### 📋 Commandes sur le serveur
+
+#### Option 1 : Build complet (quand nécessaire)
 ```bash
-cd /Users/macbookpro/Desktop/aniresa/AniReserve
-./deploy.sh
-```
-
-### 2. Entre ton mot de passe SSH quand demandé
-
-Le script va automatiquement :
-- ✅ Se connecter au serveur
-- ✅ Récupérer les derniers changements depuis GitHub
-- ✅ Installer les nouvelles dépendances
-- ✅ Rebuild l'application
-- ✅ Redémarrer l'application avec PM2
-- ✅ Afficher les logs
-
-### 3. C'est tout ! 🎉
-
-Ton site sera mis à jour sur https://anireserve.com
-
----
-
-## 🔧 Si le script ne fonctionne pas
-
-### Option 1 : Exécuter manuellement
-
-```bash
-cd /Users/macbookpro/Desktop/aniresa/AniReserve
-bash deploy.sh
-```
-
-### Option 2 : Commandes manuelles
-
-```bash
-# 1. Se connecter au serveur
-ssh root@72.61.103.149
-
-# 2. Une fois connecté, exécuter :
-cd /root/anireserve
-git pull origin main
-cd apps/web
-npm install
+cd /var/www/anireserve/apps/web
+git pull
 npm run build
 pm2 restart anireserve
-pm2 logs anireserve --lines 20
+sleep 15
+pm2 status
 ```
 
----
+#### Option 2 : Redémarrage rapide (si pas de changement de build)
+```bash
+cd /var/www/anireserve/apps/web
+git pull
+pm2 restart anireserve
+sleep 10
+pm2 status
+```
 
-## ⚠️ En cas d'erreur
+#### Option 3 : Script automatique (recommandé)
+```bash
+cd /var/www/anireserve/apps/web
 
-Si tu vois une erreur, copie-colle le message d'erreur et je t'aiderai à le résoudre !
+# Script tout-en-un
+git pull && \
+(npm run build 2>&1 | tee /tmp/build.log && pm2 restart anireserve && sleep 15 && pm2 status) || \
+(pm2 restart anireserve && sleep 10 && pm2 status)
+```
 
----
+### 🔍 Quand rebuilder vs redémarrer ?
 
-**Astuce** : Tu peux aussi faire un raccourci sur ton bureau pour le script `deploy.sh` pour un déploiement encore plus rapide ! 🎯
+**Rebuild nécessaire si :**
+- Changement dans `next.config.js`
+- Nouvelle dépendance npm
+- Changement de structure de pages
+- Erreur "Build error occurred"
+
+**Redémarrage suffisant si :**
+- Changement de code dans les composants
+- Changement dans les API routes
+- Correction de bugs simples
+- Changement de styles
+
+### ⚡ Astuce : Build en arrière-plan
+
+```bash
+# Build en arrière-plan pendant que l'app tourne
+cd /var/www/anireserve/apps/web
+git pull
+npm run build > /tmp/build.log 2>&1 &
+BUILD_PID=$!
+
+# Attendre la fin du build
+wait $BUILD_PID
+
+# Si succès, redémarrer
+if [ $? -eq 0 ]; then
+  pm2 restart anireserve
+  sleep 15
+  pm2 status
+fi
+```
+
+### 🛠️ Script de déploiement automatique
+
+Créez `/var/www/anireserve/deploy.sh` :
+
+```bash
+#!/bin/bash
+cd /var/www/anireserve/apps/web
+
+echo "📥 Récupération des changements..."
+git pull
+
+echo "🔨 Build..."
+npm run build
+
+if [ $? -eq 0 ]; then
+  echo "✅ Build réussi, redémarrage..."
+  pm2 restart anireserve
+  sleep 15
+  pm2 status
+  echo "✅ Déploiement terminé"
+else
+  echo "❌ Build échoué, redémarrage avec ancien build..."
+  pm2 restart anireserve
+  sleep 10
+  pm2 status
+fi
+```
+
+Puis utilisez simplement : `bash /var/www/anireserve/deploy.sh`
