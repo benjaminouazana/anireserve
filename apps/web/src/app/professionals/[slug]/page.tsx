@@ -9,7 +9,7 @@ import { EditButtons } from "./EditButtons";
 import { ContactButton } from "./ContactButton";
 import { NotesSection } from "./NotesSection";
 import { generateMetadata } from "./metadata";
-import { generateSlug } from "@/lib/slug";
+import { generateSlug } from "@/lib/slug-utils";
 
 export { generateMetadata };
 

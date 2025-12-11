@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getCurrentProfessional } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
-import { generateSlug } from "@/lib/slug";
+import { generateSlug } from "@/lib/slug-utils";
 import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel

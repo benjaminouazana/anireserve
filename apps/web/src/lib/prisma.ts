@@ -5,11 +5,17 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 // Configuration de la DATABASE_URL avec paramètres de connexion
+// ⚠️ IMPORTANT: Ce fichier ne doit JAMAIS être importé côté client
 const getDatabaseUrl = () => {
+  // Vérifier qu'on est côté serveur
+  if (typeof window !== "undefined") {
+    throw new Error("Prisma ne peut pas être utilisé côté client. Utilisez une API route à la place.");
+  }
+
   const url = process.env.DATABASE_URL;
   if (!url) {
     // En mode build, on peut ne pas avoir de DATABASE_URL
-    if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
+    if (process.env.NODE_ENV === "production") {
       console.warn("⚠️ DATABASE_URL n'est pas défini - utilisation d'une URL par défaut pour le build");
       return "postgresql://user:password@localhost:5432/anireserve?connection_limit=10&pool_timeout=20&connect_timeout=10";
     }

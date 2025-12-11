@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { generateSlug } from "@/lib/slug";
+import { generateSlug } from "@/lib/slug-utils";
 import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel
