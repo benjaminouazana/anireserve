@@ -7,12 +7,31 @@ import {
 } from "./email-templates";
 
 
-// Initialiser Resend (utilise uniquement la variable d'environnement RESEND_API_KEY)
+// Initialiser Resend de manière paresseuse (lazy) pour éviter les erreurs au build
 // ⚠️ SÉCURITÉ: Ne jamais mettre de clé API en dur dans le code
-if (!process.env.RESEND_API_KEY) {
-  console.warn("⚠️ RESEND_API_KEY n'est pas définie - Les emails ne pourront pas être envoyés");
+let resendInstance: Resend | null = null;
+
+function getResend(): Resend | null {
+  if (resendInstance) {
+    return resendInstance;
+  }
+  
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || apiKey === "re_placeholder") {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("⚠️ RESEND_API_KEY n'est pas définie - Les emails ne pourront pas être envoyés");
+    }
+    return null;
+  }
+  
+  try {
+    resendInstance = new Resend(apiKey);
+    return resendInstance;
+  } catch (error) {
+    console.error("Erreur initialisation Resend:", error);
+    return null;
+  }
 }
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Email pour le client : demande de réservation créée (en attente)
 export async function sendBookingRequestEmailToClient(
@@ -24,6 +43,12 @@ export async function sendBookingRequestEmailToClient(
 ) {
   try {
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Demande de réservation envoyée au client", to);
+      return { success: true, simulated: true };
+    }
+
+    const resend = getResend();
+    if (!resend) {
       console.log("📧 Email (simulé) - Demande de réservation envoyée au client", to);
       return { success: true, simulated: true };
     }
@@ -69,6 +94,12 @@ export async function sendBookingRequestEmailToPro(
 ) {
   try {
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Nouvelle demande de réservation envoyée au pro", to);
+      return { success: true, simulated: true };
+    }
+
+    const resend = getResend();
+    if (!resend) {
       console.log("📧 Email (simulé) - Nouvelle demande de réservation envoyée au pro", to);
       return { success: true, simulated: true };
     }
@@ -325,6 +356,12 @@ export async function sendPasswordResetEmail(
 
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/client/reset-password?token=${resetToken}`;
 
+    const resend = getResend();
+    if (!resend) {
+      console.log("📧 Email (simulé) - Réinitialisation mot de passe envoyée à", to);
+      return { success: true, simulated: true };
+    }
+
     await resend.emails.send({
       from: "AniReserve <noreply@anireserve.com>",
       to,
@@ -366,6 +403,12 @@ export async function sendProfessionalPasswordResetEmail(
     }
 
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pro/reset-password?token=${resetToken}`;
+
+    const resend = getResend();
+    if (!resend) {
+      console.log("📧 Email (simulé) - Réinitialisation mot de passe pro envoyée à", to);
+      return { success: true, simulated: true };
+    }
 
     await resend.emails.send({
       from: "AniReserve <noreply@anireserve.com>",
