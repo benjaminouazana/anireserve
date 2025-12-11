@@ -1,8 +1,23 @@
 import { MetadataRoute } from "next";
-import { prisma } from "@/lib/prisma";
+
+// Marquer le sitemap comme dynamique pour éviter les erreurs de build
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalider toutes les heures
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://anireserve.com";
+  
+  // Importer Prisma de manière sécurisée (lazy import pour éviter les erreurs au build)
+  let prisma: any = null;
+  try {
+    if (typeof window === "undefined" && process.env.DATABASE_URL) {
+      const prismaModule = await import("@/lib/prisma");
+      prisma = prismaModule?.prisma;
+    }
+  } catch (error) {
+    // Ignorer silencieusement si Prisma n'est pas disponible
+    console.warn("⚠️ Prisma non disponible pour le sitemap (normal si DATABASE_URL manque)");
+  }
 
   // Pages statiques publiques
   const staticPages: MetadataRoute.Sitemap = [
@@ -64,8 +79,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Pages de professionnels (dynamiques)
   try {
-    // Vérifier que Prisma est disponible (pas en build si DATABASE_URL manque)
-    if (typeof window === "undefined" && process.env.DATABASE_URL && prisma) {
+    // Vérifier que Prisma est disponible et fonctionnel
+    if (typeof window === "undefined" && process.env.DATABASE_URL && prisma && typeof prisma.professional?.findMany === 'function') {
       const professionals = await prisma.professional.findMany({
         where: {
           status: "approved",
