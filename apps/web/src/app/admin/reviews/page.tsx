@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getCurrentAdmin } from "@/lib/auth";
 import { AdminReviewsContent } from "./AdminReviewsContent";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminReviewsPage() {
   const admin = await getCurrentAdmin();
 
