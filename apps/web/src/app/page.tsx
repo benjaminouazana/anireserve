@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, Suspense } from "react";
+
+// Forcer le rendu dynamique pour éviter les erreurs de pré-rendu
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FavoriteButton } from "./FavoriteButton";
@@ -8,7 +11,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { CITIES, SERVICES, SERVICE_SUBCATEGORIES } from "@/app/pro/register/constants";
 import { useToast } from "@/components/ToastProvider";
 import { Logo } from "@/components/Logo";
-import { generateSlug } from "@/lib/slug";
+import { generateSlug } from "@/lib/slug-utils";
 import type { Professional } from "@/types/professional";
 
 // Fonction pour obtenir le slug d'un professionnel

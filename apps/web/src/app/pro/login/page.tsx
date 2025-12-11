@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+
+// Forcer le rendu dynamique pour éviter les erreurs de pré-rendu
+export const dynamic = 'force-dynamic';
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
