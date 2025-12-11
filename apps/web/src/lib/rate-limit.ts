@@ -1,124 +1,186 @@
 /**
- * Rate Limiting simple en mémoire
- * Pour production avec plusieurs instances, utiliser Redis/Upstash
+ * Rate Limiting pour les routes API
+ * Protection contre les attaques DDoS et brute force
  */
 
-interface RateLimitEntry {
-    count: number;
-    resetTime: number;
-}
+// Store simple en mémoire (pour production, utiliser Redis)
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
 
-class RateLimiter {
-    private requests: Map<string, RateLimitEntry> = new Map();
-    private windowMs: number;
-    private maxRequests: number;
-
-    constructor(windowMs: number = 60000, maxRequests: number = 10) {
-        this.windowMs = windowMs;
-        this.maxRequests = maxRequests;
-
-        // Nettoyer les anciennes entrées toutes les minutes
-        setInterval(() => this.cleanup(), 60000);
-    }
-
-    private cleanup() {
-        const now = Date.now();
-        for (const [key, entry] of this.requests.entries()) {
-            if (now > entry.resetTime) {
-                this.requests.delete(key);
-            }
-        }
-    }
-
-    async checkLimit(identifier: string): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
-        const now = Date.now();
-        const entry = this.requests.get(identifier);
-
-        if (!entry || now > entry.resetTime) {
-            // Nouvelle fenêtre
-            const resetTime = now + this.windowMs;
-            this.requests.set(identifier, { count: 1, resetTime });
-            return {
-                success: true,
-                limit: this.maxRequests,
-                remaining: this.maxRequests - 1,
-                reset: resetTime
-            };
-        }
-
-        if (entry.count >= this.maxRequests) {
-            // Limite atteinte
-            return {
-                success: false,
-                limit: this.maxRequests,
-                remaining: 0,
-                reset: entry.resetTime
-            };
-        }
-
-        // Incrémenter le compteur
-        entry.count++;
-        this.requests.set(identifier, entry);
-
-        return {
-            success: true,
-            limit: this.maxRequests,
-            remaining: this.maxRequests - entry.count,
-            reset: entry.resetTime
-        };
-    }
-}
-
-// Rate limiters pour différents endpoints
-export const loginLimiter = new RateLimiter(15 * 60 * 1000, 5); // 5 tentatives par 15 min
-export const registerLimiter = new RateLimiter(60 * 60 * 1000, 3); // 3 inscriptions par heure
-export const bookingLimiter = new RateLimiter(60 * 1000, 10); // 10 réservations par minute
-export const apiLimiter = new RateLimiter(60 * 1000, 60); // 60 requêtes par minute pour APIs générales
-
-/**
- * Helper pour obtenir l'identifiant client (IP ou user ID)
- */
-export function getClientIdentifier(request: Request): string {
-    // Essayer d'obtenir l'IP depuis les headers
-    const forwarded = request.headers.get("x-forwarded-for");
-    const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";
-
-    return ip;
+interface RateLimitOptions {
+  windowMs: number; // Fenêtre de temps en millisecondes
+  maxRequests: number; // Nombre maximum de requêtes
+  identifier?: string; // Identifiant personnalisé (par défaut: IP)
 }
 
 /**
- * Middleware de rate limiting pour Next.js
+ * Rate limiter simple basé sur l'IP
+ * Pour production, utiliser une solution Redis (Upstash, etc.)
  */
 export async function rateLimit(
-    request: Request,
-    limiter: RateLimiter = apiLimiter
-): Promise<{ success: boolean; response?: Response }> {
-    const identifier = getClientIdentifier(request);
-    const result = await limiter.checkLimit(identifier);
+  request: Request,
+  options: RateLimitOptions
+): Promise<{ success: boolean; remaining: number; resetTime: number }> {
+  const { windowMs, maxRequests, identifier } = options;
 
-    if (!result.success) {
-        const retryAfter = Math.ceil((result.reset - Date.now()) / 1000);
+  // Obtenir l'identifiant (IP par défaut)
+  const id = identifier || getClientIP(request);
+  const now = Date.now();
 
-        return {
-            success: false,
-            response: new Response(
-                JSON.stringify({
-                    error: "Trop de requêtes. Veuillez réessayer plus tard.",
-                    retryAfter
-                }),
-                {
-                    status: 429,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-RateLimit-Limit": result.limit.toString(),
-                        "X-RateLimit-Remaining": "0",
-                        "X-RateLimit-Reset": result.reset.toString(),
-                        "Retry-After": retryAfter.toString()
-                    }
-                }
-            )
-        };
+  // Nettoyer les entrées expirées (toutes les 100 requêtes pour performance)
+  if (Math.random() < 0.01) {
+    cleanupExpiredEntries(now);
+  }
+
+  // Récupérer ou créer l'entrée
+  let entry = requestCounts.get(id);
+
+  if (!entry || entry.resetTime < now) {
+    // Nouvelle fenêtre
+    entry = {
+      count: 1,
+      resetTime: now + windowMs,
+    };
+    requestCounts.set(id, entry);
+    return {
+      success: true,
+      remaining: maxRequests - 1,
+      resetTime: entry.resetTime,
+    };
+  }
+
+  // Incrémenter le compteur
+  entry.count++;
+
+  if (entry.count > maxRequests) {
+    return {
+      success: false,
+      remaining: 0,
+      resetTime: entry.resetTime,
+      response: new Response(
+        JSON.stringify({
+          error: "Trop de requêtes. Veuillez réessayer plus tard.",
+          retryAfter: Math.ceil((entry.resetTime - Date.now()) / 1000),
+        }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "X-RateLimit-Limit": maxRequests.toString(),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": new Date(entry.resetTime).toISOString(),
+            "Retry-After": Math.ceil((entry.resetTime - Date.now()) / 1000).toString(),
+          },
+        }
+      ),
+    };
+  }
+
+  return {
+    success: true,
+    remaining: maxRequests - entry.count,
+    resetTime: entry.resetTime,
+  };
+}
+
+/**
+ * Obtenir l'IP du client depuis la requête
+ */
+function getClientIP(request: Request): string {
+  // Essayer les headers X-Forwarded-For (proxy/load balancer)
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+
+  // Essayer X-Real-IP
+  const realIP = request.headers.get("x-real-ip");
+  if (realIP) {
+    return realIP;
+  }
+
+  // Fallback: utiliser une valeur par défaut (ne devrait pas arriver)
+  return "unknown";
+}
+
+/**
+ * Nettoyer les entrées expirées
+ */
+function cleanupExpiredEntries(now: number): void {
+  for (const [id, entry] of requestCounts.entries()) {
+    if (entry.resetTime < now) {
+      requestCounts.delete(id);
     }
+  }
+}
 
-    return { success: true };
+/**
+ * Preset pour login (compatibilité avec ancien code)
+ */
+export const loginLimiter = {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 5, // 5 tentatives par 15 minutes
+};
+
+/**
+ * Presets de rate limiting pour différents types de routes
+ */
+export const rateLimitPresets = {
+  // Routes d'authentification (stricte)
+  auth: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    maxRequests: 5, // 5 tentatives par 15 minutes
+  },
+  // Routes API générales
+  api: {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 60, // 60 requêtes par minute
+  },
+  // Routes d'upload (stricte)
+  upload: {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 10, // 10 uploads par minute
+  },
+  // Routes publiques (plus permissif)
+  public: {
+    windowMs: 60 * 1000, // 1 minute
+    maxRequests: 100, // 100 requêtes par minute
+  },
+};
+
+/**
+ * Middleware helper pour Next.js API routes
+ */
+export async function withRateLimit(
+  request: Request,
+  preset: keyof typeof rateLimitPresets,
+  handler: () => Promise<Response>
+): Promise<Response> {
+  const limit = await rateLimit(request, rateLimitPresets[preset]);
+
+  if (!limit.success) {
+    return new Response(
+      JSON.stringify({
+        error: "Trop de requêtes. Veuillez réessayer plus tard.",
+        retryAfter: Math.ceil((limit.resetTime - Date.now()) / 1000),
+      }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "X-RateLimit-Limit": rateLimitPresets[preset].maxRequests.toString(),
+          "X-RateLimit-Remaining": limit.remaining.toString(),
+          "X-RateLimit-Reset": new Date(limit.resetTime).toISOString(),
+          "Retry-After": Math.ceil((limit.resetTime - Date.now()) / 1000).toString(),
+        },
+      }
+    );
+  }
+
+  // Ajouter les headers de rate limit à la réponse
+  const response = await handler();
+  response.headers.set("X-RateLimit-Limit", rateLimitPresets[preset].maxRequests.toString());
+  response.headers.set("X-RateLimit-Remaining", limit.remaining.toString());
+  response.headers.set("X-RateLimit-Reset", new Date(limit.resetTime).toISOString());
+
+  return response;
 }

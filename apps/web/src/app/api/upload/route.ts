@@ -29,11 +29,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Si Supabase n'est pas configuré, retourner une URL simulée
+    // Vérifier Supabase avant utilisation
     if (!supabase) {
+      console.warn("⚠️ Supabase non configuré, retour URL simulée");
       return NextResponse.json({
         url: `https://via.placeholder.com/400?text=${encodeURIComponent(file.name)}`,
         simulated: true,
+        warning: "Supabase non configuré - mode simulé activé",
       });
     }
 
@@ -63,9 +65,10 @@ export async function POST(req: Request) {
     console.error("Erreur upload:", errorMessage);
     return NextResponse.json(
       { error: errorMessage || "Erreur lors de l'upload" },
-      { status: 500 }
+      { status: 500       }
     );
   }
+  });
 }
 
 

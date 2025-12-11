@@ -200,12 +200,6 @@ export async function sendBookingConfirmedEmailToPro(
       return { success: true, simulated: true };
     }
 
-    const resend = getResend();
-    if (!resend) {
-      console.log("📧 Email (simulé) - Confirmation envoyée au pro", to);
-      return { success: true, simulated: true };
-    }
-
     await resend.emails.send({
       from: "AniReserve <noreply@anireserve.com>",
       to,
@@ -242,6 +236,12 @@ export async function sendBookingReminderEmail(
 ) {
   try {
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Rappel de réservation envoyé à", to);
+      return { success: true, simulated: true };
+    }
+
+    const resend = getResend();
+    if (!resend) {
       console.log("📧 Email (simulé) - Rappel de réservation envoyé à", to);
       return { success: true, simulated: true };
     }
@@ -286,6 +286,12 @@ export async function sendBookingCancelledEmailToClient(
       return { success: true, simulated: true };
     }
 
+    const resend = getResend();
+    if (!resend) {
+      console.log("📧 Email (simulé) - Annulation envoyée au client", to);
+      return { success: true, simulated: true };
+    }
+
     await resend.emails.send({
       from: "AniReserve <noreply@anireserve.com>",
       to,
@@ -323,6 +329,12 @@ export async function sendBookingCancelledEmailToPro(
 ) {
   try {
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
+      console.log("📧 Email (simulé) - Annulation envoyée au pro", to);
+      return { success: true, simulated: true };
+    }
+
+    const resend = getResend();
+    if (!resend) {
       console.log("📧 Email (simulé) - Annulation envoyée au pro", to);
       return { success: true, simulated: true };
     }
