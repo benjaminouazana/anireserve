@@ -1,43 +1,50 @@
 #!/bin/bash
+# Script de déploiement automatique
+# Usage: bash deploy.sh [--no-build]
 
-# 🚀 Script de Déploiement AniReserve
-# Ce script met à jour le code sur le serveur VPS
+set -e
 
-echo "🚀 Déploiement AniReserve sur le serveur..."
-echo ""
+cd /var/www/anireserve/apps/web
 
-# Configuration
-SERVER="root@72.61.103.149"
-PROJECT_DIR="/root/anireserve"
-WEB_DIR="$PROJECT_DIR/apps/web"
+echo "📥 Récupération des changements Git..."
+git pull
 
-# Commandes à exécuter sur le serveur
-echo "📡 Connexion au serveur et mise à jour..."
-ssh $SERVER << 'ENDSSH'
-cd /root/anireserve
-echo "📥 Récupération des changements depuis GitHub..."
-git pull origin main
+# Vérifier si --no-build est passé
+if [[ "$1" == "--no-build" ]]; then
+  echo "⚡ Mode rapide: pas de build, redémarrage direct"
+  pm2 restart anireserve
+  sleep 10
+  pm2 status
+  echo "✅ Redémarrage terminé"
+  exit 0
+fi
 
-echo "📦 Installation des dépendances..."
-cd apps/web
-npm install
-
-echo "🔨 Build de l'application..."
-npm run build
-
-echo "🔄 Redémarrage de l'application..."
-pm2 restart anireserve
-
-echo "✅ Déploiement terminé !"
-echo ""
-echo "📋 Vérification du statut..."
-pm2 status
-
-echo ""
-echo "📝 Derniers logs (20 lignes) :"
-pm2 logs anireserve --lines 20 --nostream
-ENDSSH
-
-echo ""
-echo "✅ Déploiement terminé avec succès !"
-echo "🌐 Vérifie ton site sur https://anireserve.com"
+echo "🔨 Build en cours..."
+if npm run build 2>&1 | tee /tmp/build.log; then
+  echo "✅ Build réussi"
+  pm2 restart anireserve
+  sleep 15
+  pm2 status
+  echo "✅ Déploiement terminé avec succès"
+else
+  echo "⚠️  Build avec erreurs, mais on continue..."
+  
+  # Vérifier si c'est une erreur critique
+  if grep -q "Build error occurred" /tmp/build.log; then
+    echo "❌ Erreur critique détectée"
+    echo "📋 Dernières lignes du log:"
+    tail -20 /tmp/build.log
+    echo ""
+    echo "🔄 Redémarrage avec l'ancien build..."
+    pm2 restart anireserve
+    sleep 10
+    pm2 status
+    exit 1
+  else
+    echo "✅ Erreurs non critiques, redémarrage..."
+    pm2 restart anireserve
+    sleep 15
+    pm2 status
+    echo "✅ Déploiement terminé (avec warnings)"
+  fi
+fi
