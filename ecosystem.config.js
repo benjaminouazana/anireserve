@@ -2,9 +2,9 @@ module.exports = {
   apps: [{
     name: 'anireserve',
     cwd: '/var/www/anireserve/apps/web',
-    // Utiliser le chemin direct vers next au lieu de npm
-    script: 'node_modules/.bin/next',
-    args: 'start',
+    // Avec output: standalone, utiliser le serveur standalone
+    script: 'node',
+    args: '.next/standalone/server.js',
     // Optimisation: utiliser tous les CPU disponibles en mode cluster
     instances: process.env.PM2_INSTANCES || 'max', // 'max' utilise tous les CPU
     exec_mode: 'cluster', // Mode cluster pour meilleures performances
