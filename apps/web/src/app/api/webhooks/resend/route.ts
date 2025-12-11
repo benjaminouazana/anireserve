@@ -190,7 +190,17 @@ export async function POST(req: Request) {
 
     // Lire le body
     const body = await req.text();
-    const payload = JSON.parse(body);
+    let payload;
+    try {
+      payload = JSON.parse(body);
+    } catch (error) {
+      console.error("❌ Erreur parsing JSON webhook:", error);
+      console.error("Body reçu:", body?.substring(0, 500)); // Log les 500 premiers caractères
+      return NextResponse.json(
+        { error: "Format JSON invalide" },
+        { status: 400 }
+      );
+    }
 
     // Vérifier la signature (optionnel mais recommandé)
     if (RESEND_WEBHOOK_SECRET) {
